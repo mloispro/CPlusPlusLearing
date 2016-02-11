@@ -18,7 +18,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Print.h">
+    <ClInclude Include="StaticUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

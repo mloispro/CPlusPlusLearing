@@ -3,7 +3,7 @@
 
 
 namespace Utils {
-	namespace Print{
+	namespace StaticUtils{
 
 		//T& will only take references, T&& will take ref, pointer, or val, so always do this.
 		template<typename T>

@@ -4,22 +4,28 @@
 #include <iostream>
 #include "stdafx.h"
 using namespace System;
-#include "Print.h"
+#include "StaticUtils.h"
 using namespace Utils;
+#include "AClass.h"
+
+int _num = 2;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	int num = 2;
-	Print::DebugAddOne(num);
-	Console::WriteLine(num);
+	
+	StaticUtils::DebugAddOne(_num);
+	Console::WriteLine(_num);
 
-	Print::DebugAddOne(6);
+	StaticUtils::DebugAddOne(6);
 	//Console::WriteLine(num);
-	int b = Print::ReadIncomingByte();
+	int b = StaticUtils::ReadIncomingByte();
 
-	int t = Print::TestAutoInt();
-	Print::Debug(t);
+	int t = StaticUtils::TestAutoInt();
+	StaticUtils::Debug(t);
 
+	//AClass::StaticMember = _num;
+	AClass::StaticMethod();
+	
 	system("pause");
 	return 0;
 }
