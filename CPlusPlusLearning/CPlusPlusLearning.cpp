@@ -7,6 +7,7 @@ using namespace System;
 #include "StaticUtils.h"
 using namespace Utils;
 #include "AClass.h"
+using namespace System::Threading;
 
 int _num = 2;
 
@@ -25,6 +26,15 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//AClass::StaticMember = _num;
 	AClass::StaticMethod();
+
+	String^ runTime = StaticUtils::GetRuntime();
+	Thread::Sleep(2500);
+	runTime = StaticUtils::GetRuntime();
+	StaticUtils::Debug(runTime);
+	Thread::Sleep(2500);
+	StaticUtils::PrintRuntime();
+	Thread::Sleep(4500);
+	StaticUtils::PrintRuntime();
 	
 	system("pause");
 	return 0;
