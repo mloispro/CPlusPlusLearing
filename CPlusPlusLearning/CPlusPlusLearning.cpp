@@ -1,13 +1,23 @@
 // CPlusPlusLearning.cpp : Defines the entry point for the console application.
 //
-
+//#include <msclr\marshal.h>
 #include <iostream>
 #include "stdafx.h"
 using namespace System;
+using namespace System::Threading;
+
+#include "AClass.h"
+
+#include "ApiClassTester.h"
+using namespace Tests;
+#include "ApiClassExt.h"
+
 #include "StaticUtils.h"
 using namespace Utils;
-#include "AClass.h"
-using namespace System::Threading;
+
+//using namespace Extensions;
+
+
 
 int _num = 2;
 
@@ -27,16 +37,27 @@ int _tmain(int argc, _TCHAR* argv[])
 	//AClass::StaticMember = _num;
 	AClass::StaticMethod();
 
-	String^ runTime = StaticUtils::GetRuntime();
-	Thread::Sleep(2500);
-	runTime = StaticUtils::GetRuntime();
-	StaticUtils::Debug(runTime);
-	Thread::Sleep(2500);
-	StaticUtils::PrintRuntime();
-	Thread::Sleep(4500);
-	StaticUtils::PrintRuntime();
 	
+	/*String^ runTime = ApiClassExt::GetRuntime();
+	runTime = ApiClassExt::GetRuntime();
+	StaticUtils::Debug(runTime);
+	ApiClassExt::PrintRuntime();*/
+
+	//ApiClassTester apiClassTester;
+	//apiClassTester.Test();
+	ApiClassExt ext;
+	String^ runTime = ext.GetRuntime();
+	runTime = ext.GetRuntime();
+	StaticUtils::Debug(runTime);
+	ext.PrintRuntime();
+
+	ApiClassTester::Test();
+
+
+
 	system("pause");
 	return 0;
 }
+
+
 

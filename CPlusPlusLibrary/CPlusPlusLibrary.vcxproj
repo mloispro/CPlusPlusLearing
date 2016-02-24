@@ -77,7 +77,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ApiClass.h" />
+    <ClInclude Include="ApiClassExt.h" />
     <ClInclude Include="StaticUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ApiClass.cpp" />
+    <ClCompile Include="ApiClassExt.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

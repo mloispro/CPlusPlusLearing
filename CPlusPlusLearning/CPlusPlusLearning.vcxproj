@@ -84,12 +84,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ADerrivedClass.h" />
+    <ClInclude Include="ApiClassTester.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="AClass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ADerrivedClass.cpp" />
+    <ClCompile Include="ApiClassTester.cpp" />
     <ClCompile Include="CPlusPlusLearning.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="AClass.cpp" />
