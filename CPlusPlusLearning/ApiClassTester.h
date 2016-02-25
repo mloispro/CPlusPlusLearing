@@ -12,9 +12,8 @@ using namespace Utils;
 
 //using namespace Utils;
 
-
-
-#include "ApiClass.h"
+//#include "ApiClass.h"
+#include "ApiClassExt.h"
 using namespace System::Threading;
 
 namespace Tests{
@@ -25,9 +24,14 @@ namespace Tests{
 			StaticUtils::Debug("Api_Callback");
 		}
 		void Test(){
-			ApiClass apiClass;
+			/*ApiClass apiClass;
 			apiClass.SetTimeout(3000, ApiCallback);
-			apiClass.Run();
+			apiClass.Run();*/
+
+			ApiClassExt apiClassExt;
+			String^ runtime = apiClassExt.GetRuntime();
+			apiClassExt.SetTimeout(3000, ApiCallback);
+			apiClassExt.Run();
 		}
 		
 	}

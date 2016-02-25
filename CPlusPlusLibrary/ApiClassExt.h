@@ -3,10 +3,12 @@
 //#ifndef EXTENSIONS_H
 //#define EXTENSIONS_H
 
+#include "ApiClass.h"
 using namespace std;
 using namespace System;
 
-class ApiClassExt
+class ApiClassExt :
+	public ApiClass
 {
 public:
 	ApiClassExt();
