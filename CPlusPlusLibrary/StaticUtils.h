@@ -5,16 +5,25 @@
 //#include <stdlib.h>
 //#include <string.h>
 
-
+#include <vector>
 using namespace System;
 using namespace std;
 
 //using namespace msclr::interop;
 
+
 namespace Utils {
 	namespace StaticUtils{
 
 		//extern int startTime = System::DateTime::Now.Millisecond;
+		template<typename T = String^, typename T2>
+		void Debug(T ^txt, T2&& val)
+		{
+			T t(txt);
+			F f(val);
+			Console::Write(txt);
+			Console::WriteLine(val);
+		}
 		template<typename T = String^>
 		void Debug(T ^val)
 		{
@@ -29,7 +38,16 @@ namespace Utils {
 			Console::WriteLine(val);
 		}
 
-		
+		//use debug prints for debug statements that should be removed, after debugging.
+		template<typename T = String, typename F>
+		void Debug(T&& text, F&& val)
+		{
+			T t(text);
+			F f(val);
+			//String msg = String("~DEBUG~ ") + text;
+			Console::Write(text);
+			Console::WriteLine(val);
+		}
 		
 		template<typename T>
 		void DebugAddOne(T&& val)
@@ -65,8 +83,9 @@ namespace Utils {
 		}
 		
 	}
+	
 }
 
 
-#endif
 
+#endif

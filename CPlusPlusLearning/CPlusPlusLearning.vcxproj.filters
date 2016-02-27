@@ -33,6 +33,9 @@
     <ClInclude Include="ApiClassTester.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ScheduleExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
