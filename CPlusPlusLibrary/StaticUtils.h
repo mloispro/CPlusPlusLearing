@@ -1,13 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-//#include <msclr\marshal.h>
-//#include <stdlib.h>
-//#include <string.h>
-
 #include <vector>
-using namespace System;
+
 using namespace std;
+using namespace System;
 
 //using namespace msclr::interop;
 
@@ -48,7 +45,7 @@ namespace Utils {
 			Console::Write(text);
 			Console::WriteLine(val);
 		}
-		
+
 		template<typename T>
 		void DebugAddOne(T&& val)
 		{
@@ -81,9 +78,73 @@ namespace Utils {
 			int runTime = startTime + System::DateTime::Now.Millisecond;
 			return runTime;
 		}
-		
+
+		template<typename T = void>
+		void WriteLine(string text)
+		{
+			String^ val = ParseString(text);
+			Console::WriteLine(val);
+		}
+		template<typename T = void>
+		void WriteLine(String^ text)
+		{
+			Console::WriteLine(text);
+		}
+		template<typename T = void>
+		String^ ParseString(string str)
+		{
+			String^ val = gcnew String(str.c_str());
+			return val;
+		}
+		template<typename T = void>
+		void MarshalString(String ^ s, string& os)
+		{
+			using namespace Runtime::InteropServices;
+			const char* chars =
+				(const char*)(Marshal::StringToHGlobalAnsi(s)).ToPointer();
+			os = chars;
+			Marshal::FreeHGlobal(IntPtr((void*)chars));
+		}
+		template<typename T = void>
+		string ParseString(String^ str)
+		{
+			string val;
+			MarshalString(str, val);
+			return val;
+		}
+		template<typename T = void>
+		int ReadKey()
+		{
+			int key = -1;
+			ConsoleKeyInfo cki;
+			do
+			{
+				cki = Console::ReadKey();
+				switch (cki.Key)
+				{
+				case ConsoleKey::RightArrow:
+					key = 0;
+					break;
+				case ConsoleKey::UpArrow:
+					key = 1;
+					break;
+				case ConsoleKey::DownArrow:
+					key = 2;
+					break;
+				case ConsoleKey::LeftArrow:
+					key = 3;
+					break;
+				case ConsoleKey::Enter:
+					key = 4;
+					break;
+				}
+				Console::WriteLine("Key: " + cki.Key.ToString());
+				return key;
+			} while (cki.Key != ConsoleKey::Escape);
+
+		}
+
 	}
-	
 }
 
 

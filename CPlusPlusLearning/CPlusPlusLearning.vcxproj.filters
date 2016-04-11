@@ -36,6 +36,12 @@
     <ClInclude Include="ScheduleExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LCDMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LCDMenuController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -51,6 +57,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ApiClassTester.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LCDMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LCDMenuController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

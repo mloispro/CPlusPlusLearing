@@ -3,17 +3,20 @@
 //#include <msclr\marshal.h>
 #include <iostream>
 #include "stdafx.h"
-using namespace System;
-using namespace System::Threading;
+
 
 #include "AClass.h"
 
 #include "ApiClassTester.h"
 using namespace Tests;
 #include "ApiClassExt.h"
+#include "LCDMenuController.h"
 
 #include "StaticUtils.h"
 using namespace Utils;
+
+using namespace System;
+using namespace System::Threading;
 
 //#include "ScheduleExt.h"
 //using namespace Sched;
@@ -94,25 +97,47 @@ void IsTimeToRun(int runTime, int expectedNextRun, int expectedRunCountDown){
 	Console::WriteLine("------------------------------------");
 }
 
+using namespace Controllers;
+
+template<typename T=void>
+int TestMenu()
+{
+	LCDMenuController menuController;
+	
+	//int key = menuController.GetKey();
+	menuController.SelectMainMenu();
+
+	//get by ref example
+	auto&& menu = menuController.GetMenu(4,0);// need && to get ref
+	menuController.PrintLine(0, menu.Text);
+	//menuController.SetSelectedMenu(menu);
+	//auto&& selectedMenu = menuController.GetSelectedMenu();
+
+	return 0;
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	
+	TestMenu();
+
+
 	//schedules
 	//persist: lastrun and runcountdown
 	//int runTime, int expectedNextRun, int expectedRunCountDown
-	IsTimeToRun(6, 14, 14); //first run
-	IsTimeToRun(20, 20, 0);
-	IsTimeToRun(120, 120, 0);
-	IsTimeToRun(120, 140, 20); //motor ran
-	IsTimeToRun(130, 140, 10);
-	IsTimeToRun(220, 220, 0);
-	IsTimeToRun(260, 260, 0);
-	IsTimeToRun(340, 340, 0); //motor ran
-	IsTimeToRun(350, 360, 10);
-	IsTimeToRun(6, 10, 4); //power
-	IsTimeToRun(420, 420, 0);
-	IsTimeToRun(430, 440, 10);//motor ran
-	IsTimeToRun(440, 440, 0);
+	//IsTimeToRun(6, 14, 14); //first run
+	//IsTimeToRun(20, 20, 0);
+	//IsTimeToRun(120, 120, 0);
+	//IsTimeToRun(120, 140, 20); //motor ran
+	//IsTimeToRun(130, 140, 10);
+	//IsTimeToRun(220, 220, 0);
+	//IsTimeToRun(260, 260, 0);
+	//IsTimeToRun(340, 340, 0); //motor ran
+	//IsTimeToRun(350, 360, 10);
+	//IsTimeToRun(6, 10, 4); //power
+	//IsTimeToRun(420, 420, 0);
+	//IsTimeToRun(430, 440, 10);//motor ran
+	//IsTimeToRun(440, 440, 0);
 
 	//IsTimeToRun(6, 0, _runCountDown, 14, 14); //first run
 	//IsTimeToRun(20, 0, _runCountDown, 20, 0);
