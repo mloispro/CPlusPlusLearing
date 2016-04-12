@@ -35,17 +35,12 @@ public:
 	short  PrevMenuId;
 	string Text;
 	string  OptionText;
-	bool Changeable;
-
 	RangeType  TheRangeType;
+
 	//vector<LCDMenu> MenuItems; //dont work, fuck it!!!!!!!!!!
+
 	LCDMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, RangeType rangeType) :
-		LCDMenu(id, optionId, nextMenuId, prevMenuId, text, optionText,  rangeType, true)
-	{
-		//MenuItems();
-	}
-	LCDMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, RangeType rangeType, bool changeable) :
-		Id(id), OptionId(optionId), NextMenuId(nextMenuId), PrevMenuId(prevMenuId), Text(text), OptionText(optionText), TheRangeType(rangeType), Changeable(changeable)
+		Id(id), OptionId(optionId), NextMenuId(nextMenuId), PrevMenuId(prevMenuId), Text(text), OptionText(optionText), TheRangeType(rangeType)
 	{
 		//MenuItems();
 	}

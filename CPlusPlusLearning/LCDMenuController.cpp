@@ -33,14 +33,10 @@ void LCDMenuController::PrintLine(short lineNum, string text)
 
 void LCDMenuController::AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType)
 {
-	AddMenu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType, true);
-}
-void LCDMenuController::AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, bool changeable)
-{
-	//R r(rangeType);
-	LCDMenu menu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType, changeable);
+	LCDMenu menu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType);
 	_menus.push_back(menu);
 }
+
 
 
 void LCDMenuController::CreateMenus()
@@ -54,13 +50,13 @@ void LCDMenuController::CreateMenus()
 	AddMenu(mainMenu, 1, clockMenu, mainMenu, "Menu: [>] Exit", "Clock", LCDMenu::RangeType::Nav);
 
 	//feed menus
-	AddMenu(feedMenu, 0, feedTimeMenu, mainMenu, "Feedings: [<] Back", "Feed Time", LCDMenu::RangeType::Nav);
-	AddMenu(feedMenu, 1, feedFreqMenu, mainMenu, "Feedings: [<] Back", "Set Feed Time", LCDMenu::RangeType::Nav);
-	AddMenu(feedTimeMenu, 0, feedTimeMenu, feedMenu, "Feed Time: [<] Back", "Not Set", LCDMenu::RangeType::TimeFrequency, false);
+	AddMenu(feedMenu, 0, feedTimeMenu, mainMenu, "Feeder: [<] Back", "Feed Time", LCDMenu::RangeType::Nav);
+	AddMenu(feedMenu, 1, feedFreqMenu, mainMenu, "Feeder: [<] Back", "Set Feed Time", LCDMenu::RangeType::Nav);
+	AddMenu(feedTimeMenu, 0, feedTimeMenu, feedMenu, "Feed Time: [<] Back", "Not Set", LCDMenu::RangeType::TimeFrequency);
 	AddMenu(feedFreqMenu, 0, feedHourMenu, feedMenu, "Feed Frequency: [<] Back", "Frequency", LCDMenu::RangeType::FeedFrequency);
-	AddMenu(feedHourMenu, 0, feedMinMenu, feedFreqMenu, "Feeding: [<] Back", "Hour", LCDMenu::RangeType::FeedHour);
-	AddMenu(feedMinMenu, 0, feedAmPmMenu, feedHourMenu, "Feeding: [<] Back", "Minute", LCDMenu::RangeType::FeedMinute);
-	AddMenu(feedAmPmMenu, 0, feedMenu, feedMinMenu, "Feeding: [<] Back", "AM PM", LCDMenu::RangeType::FeedAmPm);
+	AddMenu(feedHourMenu, 0, feedMinMenu, feedFreqMenu, "Feed Hour: [<] Back", "Hour", LCDMenu::RangeType::FeedHour);
+	AddMenu(feedMinMenu, 0, feedAmPmMenu, feedHourMenu, "Feed Minute: [<] Back", "Minute", LCDMenu::RangeType::FeedMinute);
+	AddMenu(feedAmPmMenu, 0, feedMenu, feedMinMenu, "Feed AM-PM: [<] Back", "AM PM", LCDMenu::RangeType::FeedAmPm);
 
 	//clock menus
 	AddMenu(clockMenu, 0, clockMenu, mainMenu, "Clock: [<] Back", "Time", LCDMenu::RangeType::TimeLong);
@@ -130,20 +126,22 @@ void LCDMenuController::SetSelectedMenu(LCDMenu menu)
 }
 
 
-void LCDMenuController::PrintMenu()
+void LCDMenuController::PrintMenu(LCDMenu menu)
 {
 	/*SerialExt::Debug("menu", menu.Text);
 	SerialExt::Debug("option", menu.OptionText);
 	*/
 
-	auto menu = GetSelectedMenu();
+	//auto menu = GetSelectedMenu();
 	//String optionText = menu.OptionText;
 	String^ optionText = StaticUtils::ParseString(menu.OptionText);
 	
-	if (_rangeOptionText != "")
+	string rangeOptionText = GetRangeOption(menu.TheRangeType);
+
+	if (rangeOptionText != "")
 	{
-		//optionText = _rangeOptionText;
-		optionText = StaticUtils::ParseString(_rangeOptionText);
+		//optionText = rangeOptionText;
+		optionText = StaticUtils::ParseString(rangeOptionText);
 	}
 
 	StaticUtils::WriteLine(menu.Text);
@@ -153,7 +151,7 @@ void LCDMenuController::PrintMenu()
 	//PrintLine(0, menu.Text);
 	//PrintLine(1, optionText);
 
-	_rangeOptionText = "";
+	//_rangeOptionText = "";
 }
 
 
@@ -163,7 +161,10 @@ void LCDMenuController::SelectMainMenu()
 	//_accessingMenu = true;
 	_selectedMenuId = 0;
 	_selectedOptionId = 0;
-	PrintMenu();
+
+	auto menu = GetSelectedMenu();
+	PrintMenu(menu);
+
 	while (_selectedMenuId > -1)
 	{
 		CheckIfKeyPressed();
@@ -206,7 +207,19 @@ int LCDMenuController::GetKey()
 	return key;
 }
 
-void LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
+void LCDMenuController::LimitRange(int lower, int upper)
+{
+	if (_optionCount <= lower)
+	{
+		_optionCount = lower; //limit
+	}
+	else if (_optionCount >= upper)
+	{
+		_optionCount = upper; //limit
+	}
+}
+
+string LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
 {
 	//auto selectedMenu = GetSelectedMenu();
 
@@ -214,21 +227,20 @@ void LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
 	{
 	case LCDMenu::RangeType::FeedFrequency:
 	{
+		LimitRange(0, 1);
 		if (_optionCount <= 0)
-		{
-			_rangeOptionText = "Daily";
-			_optionCount = 0; //limit
+		{ 
+			return "Daily";
 		}
 		else if (_optionCount >= 1)
 		{
-			_rangeOptionText = "Every Other Day";
-			_optionCount = 1; //limit
+			return "Every Other Day";
 		}
 
 	}
-	break;
 	case LCDMenu::RangeType::FeedHour:
 	{
+		LimitRange(1, 12);
 		//String hour = "01";
 		String^ hour = "01";
 		if (_optionCount <= 12 && _optionCount >= 1)
@@ -238,13 +250,13 @@ void LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
 			if (_optionCount < 10)
 				hour = "0" + hour;
 		}
-		/*_rangeOptionText = hour;*/
-		_rangeOptionText = StaticUtils::ParseString(hour);
+		/*return hour;*/
+		return StaticUtils::ParseString(hour);
 
 	}
-	break;
 	case LCDMenu::RangeType::FeedMinute:
 	{
+		LimitRange(0, 60);
 		//todo get feed time from RTC..
 		String^ minute = "01";
 		if (_optionCount <= 59 && _optionCount >= 1)
@@ -254,29 +266,29 @@ void LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
 			if (_optionCount < 10)
 				minute = "0" + minute;
 		}
-		/*_rangeOptionText = hour;*/
-		_rangeOptionText = StaticUtils::ParseString(minute);
+		/*return minute;*/
+		return StaticUtils::ParseString(minute);
 
 	}
-	break;
 	case LCDMenu::RangeType::FeedAmPm:
 	{
+		LimitRange(0, 1);
 		if (_optionCount <= 1)
-			_rangeOptionText = "AM";
+			 return "AM";
 		else
-			_rangeOptionText = "PM";
+			return "PM";
 	}
-	break;
 	case LCDMenu::RangeType::TimeFrequency:
 	{
 		//Daily, 08:30AM
-		_rangeOptionText = "Get From RTC";
+		 return "Get From RTC";
 	}
 	break;
 	default:
-		_rangeOptionText = "";
+		return "";
 		break;
 	}
+
 
 	//return selectedMenu;
 }
@@ -284,6 +296,8 @@ void LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
 
 void LCDMenuController::NextOption()
 {
+	
+
 	//bool optionChanged = false;
 	if (_selectedOptionId >= 0)
 	{
@@ -299,22 +313,20 @@ void LCDMenuController::NextOption()
 	auto selectedMenu = GetSelectedMenu();
 	
 	//if (selectedMenu.TheRangeType != LCDMenu::RangeType::Nav && selectedMenu.Changeable)
-	GetRangeOption(selectedMenu.TheRangeType);
-
-	//_selectedMenuId = nextOption.Id;
-	//return nextOption;
-}
-
-void LCDMenuController::DownButton()
-{
+	//GetRangeOption(selectedMenu.TheRangeType);
+	
 	_optionCount++;
-	NextOption();
-	PrintMenu();
+	PrintMenu(selectedMenu);
 
+	
 }
+
+
 
 void LCDMenuController::PreviousOption()
 {
+	
+
 	//bool optionChanged = false;
 	if (_selectedOptionId > 0)
 	{
@@ -330,16 +342,12 @@ void LCDMenuController::PreviousOption()
 	auto selectedMenu = GetSelectedMenu();
 
 	
-	GetRangeOption(selectedMenu.TheRangeType);
+	//GetRangeOption(selectedMenu.TheRangeType);
 	
+	_optionCount--;
+	PrintMenu(selectedMenu);
 }
 
-void LCDMenuController::UpButton()
-{
-	_optionCount--;
-	PreviousOption();
-	PrintMenu();
-}
 
 void LCDMenuController::LeftButton()
 {
@@ -348,7 +356,7 @@ void LCDMenuController::LeftButton()
 	auto selectedMenu = GetSelectedMenu();
 	auto prevMenu = GetMenu(selectedMenu.PrevMenuId, 0);
 	SetSelectedMenu(prevMenu);
-	PrintMenu();
+	PrintMenu(prevMenu);
 }
 
 void LCDMenuController::SaveRangeOption(LCDMenu::RangeType rangeType)
@@ -360,30 +368,41 @@ void LCDMenuController::SaveRangeOption(LCDMenu::RangeType rangeType)
 	{
 	case LCDMenu::RangeType::FeedFrequency:
 	{
-		if (_rangeOptionText == "Daily")
+		if (_optionCount==0) //Daily
 		{
 			//save to eeprom
+
+			//FeedEvery
+			//NextFeed
+		} 
+		else // ot day
+		{
+
 		}
 		break;
 	}
 	case LCDMenu::RangeType::FeedHour:
 	{
 
-		break;
+		
 	}
+	break;
 	case LCDMenu::RangeType::FeedMinute:
 	{
-		break;
+		
 	}
+	break;
 	case LCDMenu::RangeType::FeedAmPm:
 	{
-		break;
+		
 	}
+	break;
 	case LCDMenu::RangeType::TimeFrequency:
 	{
 		//Daily, 08:30AM
-		break;
+		
 	}
+	break;
 	default:
 		break;
 	}
@@ -394,13 +413,13 @@ void LCDMenuController::SaveRangeOption(LCDMenu::RangeType rangeType)
 
 void LCDMenuController::SelectButton()
 {
-	_optionCount = 0;
-	auto selectedMenu = GetSelectedMenu();
+	
+	//auto selectedMenu = GetSelectedMenu();
 
 	//save to eeporm
-	if (selectedMenu.TheRangeType != LCDMenu::RangeType::Nav && selectedMenu.Changeable){
-		SaveRangeOption(selectedMenu.TheRangeType);
-	}
+	//if (selectedMenu.TheRangeType != LCDMenu::RangeType::Nav && selectedMenu.Changeable)
+	//SaveRangeOption(selectedMenu.TheRangeType);
+	//_optionCount = 0;
 	
 	//auto nextMenu = GetMenu(selectedMenu.NextMenuId, 0);
 
@@ -409,12 +428,19 @@ void LCDMenuController::SelectButton()
 		GetRangeOption(selectedMenu.TheRangeType);
 	}*/
 
-	_selectedMenuId = selectedMenu.NextMenuId;
-	_selectedOptionId = 0;
+	
+	auto selectedMenu = GetSelectedMenu();
+	SaveRangeOption(selectedMenu.TheRangeType);
+	_optionCount = 0;
 
-	NextOption();
+	auto nextMenu = GetMenu(selectedMenu.NextMenuId, 0);
+	SetSelectedMenu(nextMenu);
+	PrintMenu(nextMenu);
 
-	PrintMenu();
+
+	///NextOption();
+
+	//PrintMenu();
 }
 
 
@@ -438,10 +464,10 @@ void LCDMenuController::CheckIfKeyPressed()
 		ExitMainMenu();
 		break;
 	case 1: //up
-		UpButton();
+		PreviousOption();
 		break;
 	case 2: //down
-		DownButton();
+		NextOption();
 		break;
 	case 3: //left
 		LeftButton();

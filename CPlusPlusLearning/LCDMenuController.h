@@ -52,13 +52,11 @@ namespace Controllers {
 		
 		short _selectedMenuId = -1;
 		short _selectedOptionId = -1;
-		string _rangeOptionText;
+		//string _rangeOptionText;
 		int _optionCount;
 		//LiquidCrystal _lcd(8, 9, 4, 5, 6, 7);
 		
-		/*int CurrentMenuIndex;
-		int CurrentMenuItemIndex;
-		int _oldMenuItemIndex = -1;*/
+		void LimitRange(int lower, int upper);
 
 	public:
 		
@@ -69,13 +67,12 @@ namespace Controllers {
 		//template<typename T>
 		void PrintLine(short lineNum, string text);
 		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType);
-		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, bool selectable);
 		void CreateMenus();
 
 		//--Menu functions
 		LCDMenu GetMenu(short id, short optionId);
 
-		void PrintMenu();
+		void PrintMenu(LCDMenu menu);
 
 		void SelectMainMenu();
 		void ExitMainMenu();
@@ -83,11 +80,9 @@ namespace Controllers {
 		////--key press
 		int GetKeyFromVal(unsigned int input);
 		int GetKey();
-		void GetRangeOption(LCDMenu::RangeType rangeType);
+		string GetRangeOption(LCDMenu::RangeType rangeType);
 		void NextOption();
-		void DownButton();
 		void PreviousOption();
-		void UpButton();
 		void LeftButton();
 		void SaveRangeOption(LCDMenu::RangeType rangeType);
 		void SelectButton();
