@@ -42,6 +42,9 @@
     <ClInclude Include="LCDMenuController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RTCExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

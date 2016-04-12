@@ -99,9 +99,23 @@ void IsTimeToRun(int runTime, int expectedNextRun, int expectedRunCountDown){
 
 using namespace Controllers;
 
-template<typename T=void>
+template<typename T = void>
+void UpdateTime()
+{
+	while (true)
+	{
+		RTCExt::UpdateNextFeed();
+		Thread::Sleep(10000);
+	}
+	
+}
+
+template<typename T = void>
 int TestMenu()
 {
+	Thread^ thisThread = gcnew Thread(gcnew ThreadStart(UpdateTime));
+	thisThread->Start();
+
 	LCDMenuController menuController;
 	
 	//int key = menuController.GetKey();

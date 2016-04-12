@@ -9,6 +9,7 @@
 //#include <msclr\marshal_cppstd.h>
 
 #include "StaticUtils.h"
+#include "RTCExt.h"
 using namespace Utils;
 
 //#include <StandardCplusplus.h>
