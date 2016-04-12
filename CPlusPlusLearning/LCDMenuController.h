@@ -29,6 +29,7 @@ using namespace std;
 namespace Controllers {
 
 	class LCDMenuController{
+	private:
 		//using namespace Utils;
 		const short mainMenu = 0;
 		const short feedMenu = 1;
@@ -40,6 +41,7 @@ namespace Controllers {
 		const short clockYearMenu = 7;
 		const short clockMonthMenu = 8;
 		const short clockDayMenu = 9;
+		const short feedTimeMenu = 10;
 
 		//bool _accessingMenu = false;
 		//bool _menuChanged = false;
@@ -67,6 +69,7 @@ namespace Controllers {
 		//template<typename T>
 		void PrintLine(short lineNum, string text);
 		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType);
+		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, bool selectable);
 		void CreateMenus();
 
 		//--Menu functions
@@ -80,7 +83,7 @@ namespace Controllers {
 		////--key press
 		int GetKeyFromVal(unsigned int input);
 		int GetKey();
-		void GetRangeOption();
+		void GetRangeOption(LCDMenu::RangeType rangeType);
 		void NextOption();
 		void DownButton();
 		void PreviousOption();
