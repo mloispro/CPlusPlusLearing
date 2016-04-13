@@ -44,6 +44,11 @@ namespace Controllers {
 		const short clockDayMenu = 9;
 		const short feedTimeMenu = 10;
 
+		const int _minuteLowerLimit = 0;
+		const int _minuteUpperLimit = 59;
+		const int _hourLowerLimit = 0;
+		const int _hourUpperLimit = 12;
+		
 		//bool _accessingMenu = false;
 		//bool _menuChanged = false;
 
@@ -54,19 +59,20 @@ namespace Controllers {
 		short _selectedMenuId = -1;
 		short _selectedOptionId = -1;
 		//string _rangeOptionText;
-		int _optionCount;
+		
 		//LiquidCrystal _lcd(8, 9, 4, 5, 6, 7);
 		
 		void LimitRange(int lower, int upper);
 
 	public:
-		
+		int _optionCount;
+
 		LCDMenuController();
 		
 		LCDMenu GetSelectedMenu();
 		void SetSelectedMenu(LCDMenu menu);
 		//template<typename T>
-		void PrintLine(short lineNum, string text);
+		void PrintLine(short lineNum, String^ text);
 		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType);
 		void CreateMenus();
 
@@ -88,6 +94,7 @@ namespace Controllers {
 		void SaveRangeOption(LCDMenu::RangeType rangeType);
 		void SelectButton();
 		void CheckIfKeyPressed();
+		void PrintFeedInfo();
 
 	};
 }

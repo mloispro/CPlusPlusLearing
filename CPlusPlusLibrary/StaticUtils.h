@@ -97,7 +97,7 @@ namespace Utils {
 			return val;
 		}
 		template<typename T = void>
-		void MarshalString(String ^ s, string& os)
+       void MarshalString(String ^ s, string& os)
 		{
 			using namespace Runtime::InteropServices;
 			const char* chars =

@@ -10,7 +10,7 @@ LCDMenuController::LCDMenuController()
 	
 
 
-void LCDMenuController::PrintLine(short lineNum, string text)
+void LCDMenuController::PrintLine(short lineNum, String^ text)
 {
 	//T t(text);
 	//_lcd.setCursor(0, lineNum);
@@ -240,10 +240,10 @@ string LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
 	}
 	case LCDMenu::RangeType::FeedHour:
 	{
-		LimitRange(1, 12);
+		LimitRange(_hourLowerLimit, _hourUpperLimit);
 		//String hour = "01";
 		String^ hour = "01";
-		if (_optionCount <= 12 && _optionCount >= 1)
+		if (_optionCount <= _hourUpperLimit && _optionCount >= _hourLowerLimit)
 		{
 			//hour = String(_optionCount);
 			hour = System::Convert::ToString(_optionCount);
@@ -256,10 +256,10 @@ string LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
 	}
 	case LCDMenu::RangeType::FeedMinute:
 	{
-		LimitRange(0, 60);
+		LimitRange(_minuteLowerLimit, _minuteUpperLimit);
 		//todo get feed time from RTC..
 		String^ minute = "01";
-		if (_optionCount <= 59 && _optionCount >= 1)
+		if (_optionCount <= _minuteUpperLimit && _optionCount >= _minuteLowerLimit)
 		{
 			//hour = String(_optionCount);
 			minute = System::Convert::ToString(_optionCount);
@@ -363,38 +363,33 @@ void LCDMenuController::SaveRangeOption(LCDMenu::RangeType rangeType)
 {
 	//SerialExt::Debug("save", selectedMenu.OptionText);
 	
-
 	switch (rangeType)
 	{
 	case LCDMenu::RangeType::FeedFrequency:
 	{
 		if (_optionCount==0) //Daily
 		{
-			//save to eeprom
-
-			//FeedEvery
-			//NextFeed
+			RTCExt::SetFeedEvery(24);
 		} 
 		else // ot day
 		{
-
+			RTCExt::SetFeedEvery(48);
 		}
 		break;
 	}
 	case LCDMenu::RangeType::FeedHour:
 	{
-
-		
+		RTCExt::SetFeedNextRun(_optionCount, rangeType);
 	}
 	break;
 	case LCDMenu::RangeType::FeedMinute:
 	{
-		
+		RTCExt::SetFeedNextRun(_optionCount, rangeType);
 	}
 	break;
 	case LCDMenu::RangeType::FeedAmPm:
 	{
-		
+		RTCExt::SetFeedNextRun(_optionCount, rangeType);
 	}
 	break;
 	case LCDMenu::RangeType::TimeFrequency:
@@ -414,21 +409,6 @@ void LCDMenuController::SaveRangeOption(LCDMenu::RangeType rangeType)
 void LCDMenuController::SelectButton()
 {
 	
-	//auto selectedMenu = GetSelectedMenu();
-
-	//save to eeporm
-	//if (selectedMenu.TheRangeType != LCDMenu::RangeType::Nav && selectedMenu.Changeable)
-	//SaveRangeOption(selectedMenu.TheRangeType);
-	//_optionCount = 0;
-	
-	//auto nextMenu = GetMenu(selectedMenu.NextMenuId, 0);
-
-
-	/*if (_selectedMenuId == selectedMenu.NextMenuId){
-		GetRangeOption(selectedMenu.TheRangeType);
-	}*/
-
-	
 	auto selectedMenu = GetSelectedMenu();
 	SaveRangeOption(selectedMenu.TheRangeType);
 	_optionCount = 0;
@@ -437,10 +417,6 @@ void LCDMenuController::SelectButton()
 	SetSelectedMenu(nextMenu);
 	PrintMenu(nextMenu);
 
-
-	///NextOption();
-
-	//PrintMenu();
 }
 
 
@@ -478,5 +454,42 @@ void LCDMenuController::CheckIfKeyPressed()
 	default:
 		break;
 
+	}
+	
+}
+//template<typename T =void>
+void LCDMenuController::PrintFeedInfo()
+{
+	for (int i = 0; i <= 3; i++)
+	{
+		RTCExt::UpdateNextFeed();
+
+		String^ nextFeed;
+		String^ lastFeed;
+		String^ countDown;
+
+		switch (i) {
+		case 0:
+			lastFeed = RTCExt::GetShortDateTimeString(RTCExt::NextFeedInfo.LastRun);
+
+			PrintLine(0, "Last Feed:");
+			PrintLine(1, lastFeed);
+			break;
+		case 1:
+			countDown = RTCExt::GetTimeRemainingString(RTCExt::NextFeedInfo.CountDown);
+
+			PrintLine(0, "Count Down:");
+			PrintLine(1, countDown);
+			break;
+		case 2:
+			nextFeed = RTCExt::GetShortDateTimeString(RTCExt::NextFeedInfo.NextRun);
+
+			PrintLine(0, "Next Feed:");
+			PrintLine(1, nextFeed);
+			break;
+		default:
+			break;
+		}
+		//delay(_scrollDelay);
 	}
 }

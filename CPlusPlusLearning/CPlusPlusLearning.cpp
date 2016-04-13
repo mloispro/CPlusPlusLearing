@@ -1,8 +1,9 @@
 // CPlusPlusLearning.cpp : Defines the entry point for the console application.
 //
 //#include <msclr\marshal.h>
-#include <iostream>
 #include "stdafx.h"
+#include <iostream>
+
 
 
 #include "AClass.h"
@@ -17,6 +18,9 @@ using namespace Utils;
 
 using namespace System;
 using namespace System::Threading;
+//using namespace System::ComponentModel;         // for BackgroundWorker  
+//
+//public: System::ComponentModel::BackgroundWorker ^bgw;
 
 //#include "ScheduleExt.h"
 //using namespace Sched;
@@ -100,32 +104,40 @@ void IsTimeToRun(int runTime, int expectedNextRun, int expectedRunCountDown){
 using namespace Controllers;
 
 template<typename T = void>
-void UpdateTime()
-{
-	while (true)
-	{
-		RTCExt::UpdateNextFeed();
-		Thread::Sleep(10000);
-	}
-	
-}
-
-template<typename T = void>
 int TestMenu()
 {
-	Thread^ thisThread = gcnew Thread(gcnew ThreadStart(UpdateTime));
-	thisThread->Start();
 
 	LCDMenuController menuController;
-	
-	//int key = menuController.GetKey();
-	menuController.SelectMainMenu();
+	//menuController.SelectMainMenu();
 
-	//get by ref example
-	auto&& menu = menuController.GetMenu(4,0);// need && to get ref
-	menuController.PrintLine(0, menu.Text);
-	//menuController.SetSelectedMenu(menu);
-	//auto&& selectedMenu = menuController.GetSelectedMenu();
+	//RTCExt::NextFeedInfo.RunEvery = 8640000;
+	//RTCExt::SetFeedHour(24);
+	//long runEvery = RTCExt::NextFeedInfo.RunEvery;
+	//RTCExt::UpdateNextFeed();
+
+	menuController._optionCount = 1;
+	menuController.SaveRangeOption(LCDMenu::RangeType::FeedFrequency);
+	
+	menuController._optionCount = 8;
+	menuController.SaveRangeOption(LCDMenu::RangeType::FeedHour);
+
+	menuController._optionCount = 42;
+	menuController.SaveRangeOption(LCDMenu::RangeType::FeedMinute);
+
+	menuController._optionCount = 1;
+	menuController.SaveRangeOption(LCDMenu::RangeType::FeedAmPm);
+	menuController.PrintFeedInfo();
+
+	menuController._optionCount = 0;
+	menuController.SaveRangeOption(LCDMenu::RangeType::FeedAmPm);
+
+	menuController.PrintFeedInfo();
+	Thread::Sleep(60000);
+	menuController.PrintFeedInfo();
+	Thread::Sleep(60000);
+	menuController.PrintFeedInfo();
+	Thread::Sleep(60000);
+
 
 	return 0;
 }
