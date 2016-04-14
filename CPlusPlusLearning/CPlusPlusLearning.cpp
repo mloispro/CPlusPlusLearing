@@ -101,46 +101,85 @@ void IsTimeToRun(int runTime, int expectedNextRun, int expectedRunCountDown){
 	Console::WriteLine("------------------------------------");
 }
 
+#pragma region LCDMenu
+
 using namespace Controllers;
+
+template<typename T = void>
+void TestSetTimer(LCDMenuController menuController, long sleepSec){
+	
+	long sleep = sleepSec * 1000;
+
+	menuController._optionCount = 1;
+	menuController.SaveRangeOption(LCDMenu::RangeType::Frequency, LCDMenu::MenuType::Feeder);
+
+	menuController._optionCount = 8;
+	menuController.SaveRangeOption(LCDMenu::RangeType::Hour, LCDMenu::MenuType::Feeder);
+
+	menuController._optionCount = 42;
+	menuController.SaveRangeOption(LCDMenu::RangeType::Minute, LCDMenu::MenuType::Feeder);
+
+	menuController._optionCount = 1;
+	menuController.SaveRangeOption(LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Feeder);
+	menuController.PrintFeedInfo();
+
+	menuController._optionCount = 0;
+	menuController.SaveRangeOption(LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Feeder);
+
+	menuController.PrintFeedInfo();
+	Thread::Sleep(sleep);
+	menuController.PrintFeedInfo();
+	Thread::Sleep(sleep);
+	menuController.PrintFeedInfo();
+	Thread::Sleep(sleep);
+}
+
+template<typename T = void>
+void TestSetClock(LCDMenuController menuController){
+	
+	menuController._optionCount = 2020;
+	menuController.SaveRangeOption(LCDMenu::RangeType::Year, LCDMenu::MenuType::Clock);
+	
+	menuController._optionCount = 2;
+	menuController.SaveRangeOption(LCDMenu::RangeType::Month, LCDMenu::MenuType::Clock);
+
+	menuController._optionCount = 20;
+	menuController.SaveRangeOption(LCDMenu::RangeType::Day, LCDMenu::MenuType::Clock);
+
+	menuController._optionCount = 3;
+	menuController.SaveRangeOption(LCDMenu::RangeType::Hour, LCDMenu::MenuType::Clock);
+
+	menuController._optionCount = 22;
+	menuController.SaveRangeOption(LCDMenu::RangeType::Minute, LCDMenu::MenuType::Clock);
+
+	menuController._optionCount = 0;
+	menuController.SaveRangeOption(LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Clock);
+
+	menuController.PrintTime();
+}
+
 
 template<typename T = void>
 int TestMenu()
 {
 
 	LCDMenuController menuController;
-	//menuController.SelectMainMenu();
+	menuController.SelectMainMenu();
+	menuController.PrintFeedInfo();
 
 	//RTCExt::NextFeedInfo.RunEvery = 8640000;
 	//RTCExt::SetFeedHour(24);
 	//long runEvery = RTCExt::NextFeedInfo.RunEvery;
 	//RTCExt::UpdateNextFeed();
 
-	menuController._optionCount = 1;
-	menuController.SaveRangeOption(LCDMenu::RangeType::FeedFrequency);
-	
-	menuController._optionCount = 8;
-	menuController.SaveRangeOption(LCDMenu::RangeType::FeedHour);
+	//TestSetClock(menuController);
 
-	menuController._optionCount = 42;
-	menuController.SaveRangeOption(LCDMenu::RangeType::FeedMinute);
-
-	menuController._optionCount = 1;
-	menuController.SaveRangeOption(LCDMenu::RangeType::FeedAmPm);
-	menuController.PrintFeedInfo();
-
-	menuController._optionCount = 0;
-	menuController.SaveRangeOption(LCDMenu::RangeType::FeedAmPm);
-
-	menuController.PrintFeedInfo();
-	Thread::Sleep(60000);
-	menuController.PrintFeedInfo();
-	Thread::Sleep(60000);
-	menuController.PrintFeedInfo();
-	Thread::Sleep(60000);
-
+	//TestSetTimer(menuController, 60);
 
 	return 0;
 }
+
+#pragma endregion LCDMenu
 
 int _tmain(int argc, _TCHAR* argv[])
 {

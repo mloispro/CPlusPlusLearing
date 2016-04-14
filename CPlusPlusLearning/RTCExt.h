@@ -31,6 +31,9 @@ namespace Utils {
 		int Hours;
 		int Minutes;
 		int Seconds;
+		short Day;
+		short Month;
+		short Year;
 
 		DigitalTime(int hours, int minutes, int seconds) : Hours(hours), Minutes(minutes), Seconds(seconds){}
 	};
@@ -45,6 +48,8 @@ namespace Utils {
 		static NextRunMemory NextDoseInfo;
 
 		//--dont copy to EAL-->
+#define EAL_DONT_COPY
+		
 		static int SECS_PER_MIN = 60;
 		static int SECS_PER_HOUR = 3600;
 		static int SECS_PER_DAY = 86400;
@@ -56,6 +61,27 @@ namespace Utils {
 		//#define hoursToTime_t   ((H)) ( (H) * SECS_PER_HOUR)  
 		//#define daysToTime_t    ((D)) ( (D) * SECS_PER_DAY) // fixed on Jul 22 2011
 
+		static time_t _rtcTime;
+		template<typename T = void>
+		int now()
+		{
+			//int now = System::DateTime::Now.Millisecond;
+
+			//time_t t = time(NULL);
+			//tm* timePtr = localtime(&t);
+
+			time_t t = time(NULL); //gets current time
+			/*	struct tm * timeinfo;
+
+			time(&now);
+			timeinfo = localtime(&now);*/
+
+			if (_rtcTime != 0){
+				return _rtcTime;
+			}
+
+			return t;
+		}
 
 		template<typename T = void>
 		int day(time_t time)
@@ -118,7 +144,31 @@ namespace Utils {
 			return (hour(t) >= 12);
 		}
 		
+		template<typename T = void>
+		void SetRTCTime(int theHour, int theMinute, int theSecond, int theDay, int theMonth, int theYear)
+		{
+			time_t t = time(NULL);
+			tm timePtr;
+			localtime_s(&timePtr, &t);
+			timePtr.tm_hour = theHour;
+			timePtr.tm_min = theMinute;
+			timePtr.tm_sec = theSecond;
+			timePtr.tm_mday = theDay;
+			timePtr.tm_mon = theMonth;
+			timePtr.tm_year = theYear - 1900;
+			
+			_rtcTime = mktime(&timePtr);
+
+		}
+		template<typename T = void>
+		time_t GetRTCTime()
+		{
+			return now();
+		}
+#define EAL_DONT_COPY_END
 		//<--dont copy to EAL--
+
+		static DigitalTime _timeTemp(0, 0, 0);
 
 		template<typename H = int, typename M = int, typename S = int>
 		String^ FormatDigialTime(H&& hours, M&& minutes, S&& seconds)
@@ -222,22 +272,6 @@ namespace Utils {
 		}
 
 		template<typename T = void>
-		time_t GetRTCTime()
-		{
-			//int now = System::DateTime::Now.Millisecond;
-
-			//time_t t = time(NULL);
-			//tm* timePtr = localtime(&t);
-
-			time_t now = time(NULL); //gets current time
-			/*	struct tm * timeinfo;
-
-				time(&now);
-				timeinfo = localtime(&now);*/
-			return now;
-		}
-
-		template<typename T = void>
 		bool IsRTCTimeSet()
 		{
 			auto time = GetRTCTime();
@@ -334,6 +368,38 @@ namespace Utils {
 		//	tm tm;
 		//	tm.tm_hour = h;
 		//}
+		template<typename T=void>
+		void SetRTCTimeFromTemp()
+		{
+			SetRTCTime(_timeTemp.Hours, _timeTemp.Minutes, _timeTemp.Seconds, _timeTemp.Day, _timeTemp.Month, _timeTemp.Year);
+		}
+
+		template<typename T, typename M = LCDMenu::RangeType>
+		void SetTimeTemp(T&& val, M&& rangeType)
+		{
+			T t(val);
+
+			if (rangeType == LCDMenu::RangeType::Year)
+				_timeTemp.Year = val;
+			else if (rangeType == LCDMenu::RangeType::Month)
+				_timeTemp.Month = val;
+			else if (rangeType == LCDMenu::RangeType::Day)
+				_timeTemp.Day = val;
+			else if (rangeType == LCDMenu::RangeType::Hour)
+				_timeTemp.Hours = val;
+			else if (rangeType == LCDMenu::RangeType::Minute)
+				_timeTemp.Minutes = val;
+			else if (rangeType == LCDMenu::RangeType::AmPm)
+			{
+				if (val == 1 && _timeTemp.Hours > 12) //PM
+					_timeTemp.Hours = _timeTemp.Hours - 12;
+				else if (val == 0 && _timeTemp.Hours < 12)//AM
+					_timeTemp.Hours = _timeTemp.Hours + 12;
+			}
+				//_timeTemp.Seconds = val;
+
+			
+		}
 		template<typename T, typename M = LCDMenu::RangeType>
 		void SetFeedNextRun(T&& val, M&& rangeType)
 		{
@@ -343,11 +409,11 @@ namespace Utils {
 			auto nrTime = time_t(NextFeedInfo.NextRun);
 			localtime_s(&timePtr, &nrTime);
 
-			if (rangeType == LCDMenu::RangeType::FeedMinute)
+			if (rangeType == LCDMenu::RangeType::Minute)
 				timePtr.tm_min = val;
-			else if (rangeType == LCDMenu::RangeType::FeedHour)
+			else if (rangeType == LCDMenu::RangeType::Hour)
 				timePtr.tm_hour = val;
-			else if (rangeType == LCDMenu::RangeType::FeedAmPm)
+			else if (rangeType == LCDMenu::RangeType::AmPm)
 			{
 				if (val == 1 && timePtr.tm_hour < 12) //PM
 					timePtr.tm_hour = timePtr.tm_hour + 12;

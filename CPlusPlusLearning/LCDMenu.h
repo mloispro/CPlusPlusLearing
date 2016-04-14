@@ -17,16 +17,25 @@ public:
 	enum RangeType
 	{
 		Nav,
-		ClockYear,
-		ClockMonth,
-		ClockDay,
-		FeedHour,
-		FeedMinute,
-		FeedAmPm,
-		FeedFrequency,
+		Year,
+		Month,
+		Day,
+		Hour,
+		Minute,
+		AmPm,
+		Frequency,
 		TimeLong,
 		TimeShort,
 		TimeFrequency,
+	};
+
+	enum MenuType
+	{
+		Main,
+		Clock,
+		Feeder,
+		LiqDoser,
+		DryDoser
 	};
 
 	short Id;
@@ -36,13 +45,18 @@ public:
 	string Text;
 	string  OptionText;
 	RangeType  TheRangeType;
+	MenuType TheMenuType;
 
 	//vector<LCDMenu> MenuItems; //dont work, fuck it!!!!!!!!!!
 
-	LCDMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, RangeType rangeType) :
-		Id(id), OptionId(optionId), NextMenuId(nextMenuId), PrevMenuId(prevMenuId), Text(text), OptionText(optionText), TheRangeType(rangeType)
+	LCDMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, RangeType rangeType, MenuType menuType) :
+		Id(id), OptionId(optionId), NextMenuId(nextMenuId), PrevMenuId(prevMenuId), Text(text), OptionText(optionText), TheRangeType(rangeType), TheMenuType(menuType)
 	{
 		//MenuItems();
+	}
+	LCDMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, RangeType rangeType) :
+		LCDMenu( id,  optionId,  nextMenuId,  prevMenuId,  text,  optionText,  rangeType, MenuType::Main)
+	{
 	}
 
 };

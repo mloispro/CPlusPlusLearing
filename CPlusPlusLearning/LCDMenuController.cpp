@@ -9,34 +9,15 @@ LCDMenuController::LCDMenuController()
 }
 	
 
-
-void LCDMenuController::PrintLine(short lineNum, String^ text)
+void LCDMenuController::AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, LCDMenu::MenuType menuType)
 {
-	//T t(text);
-	//_lcd.setCursor(0, lineNum);
-	//_lcd.print(text);
-	StaticUtils::WriteLine(text);
-}
-
-
-	//template<typename T = void>
-	//void Clear()
-	//{
-	//	_lcd.clear();
-	//}
-
-	/*int GetSize()
-	{
-	return MenuItems.size();
-	}*/
-
-
-void LCDMenuController::AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType)
-{
-	LCDMenu menu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType);
+	LCDMenu menu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType, menuType);
 	_menus.push_back(menu);
 }
-
+void LCDMenuController::AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType)
+{
+	AddMenu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType, LCDMenu::MenuType::Main);
+}
 
 
 void LCDMenuController::CreateMenus()
@@ -50,20 +31,20 @@ void LCDMenuController::CreateMenus()
 	AddMenu(mainMenu, 1, clockMenu, mainMenu, "Menu: [>] Exit", "Clock", LCDMenu::RangeType::Nav);
 
 	//feed menus
-	AddMenu(feedMenu, 0, feedTimeMenu, mainMenu, "Feeder: [<] Back", "Feed Time", LCDMenu::RangeType::Nav);
-	AddMenu(feedMenu, 1, feedFreqMenu, mainMenu, "Feeder: [<] Back", "Set Feed Time", LCDMenu::RangeType::Nav);
-	AddMenu(feedTimeMenu, 0, feedTimeMenu, feedMenu, "Feed Time: [<] Back", "Not Set", LCDMenu::RangeType::TimeFrequency);
-	AddMenu(feedFreqMenu, 0, feedHourMenu, feedMenu, "Feed Frequency: [<] Back", "Frequency", LCDMenu::RangeType::FeedFrequency);
-	AddMenu(feedHourMenu, 0, feedMinMenu, feedFreqMenu, "Feed Hour: [<] Back", "Hour", LCDMenu::RangeType::FeedHour);
-	AddMenu(feedMinMenu, 0, feedAmPmMenu, feedHourMenu, "Feed Minute: [<] Back", "Minute", LCDMenu::RangeType::FeedMinute);
-	AddMenu(feedAmPmMenu, 0, feedMenu, feedMinMenu, "Feed AM-PM: [<] Back", "AM PM", LCDMenu::RangeType::FeedAmPm);
+	AddMenu(feedMenu, 0, feedTimeMenu, mainMenu, "Feeder: [<] Back", "Feed Time", LCDMenu::RangeType::Nav, LCDMenu::MenuType::Feeder);
+	AddMenu(feedMenu, 1, feedFreqMenu, mainMenu, "Feeder: [<] Back", "Set Feed Time", LCDMenu::RangeType::Nav, LCDMenu::MenuType::Feeder);
+	AddMenu(feedTimeMenu, 0, feedTimeMenu, feedMenu, "Feed Time: [<] Back", "Not Set", LCDMenu::RangeType::TimeFrequency, LCDMenu::MenuType::Feeder);
+	AddMenu(feedFreqMenu, 0, feedHourMenu, feedMenu, "Feed Frequency: [<] Back", "Frequency", LCDMenu::RangeType::Frequency, LCDMenu::MenuType::Feeder);
+	AddMenu(feedHourMenu, 0, feedMinMenu, feedFreqMenu, "Feed Hour: [<] Back", "Hour", LCDMenu::RangeType::Hour, LCDMenu::MenuType::Feeder);
+	AddMenu(feedMinMenu, 0, feedAmPmMenu, feedHourMenu, "Feed Minute: [<] Back", "Minute", LCDMenu::RangeType::Minute, LCDMenu::MenuType::Feeder);
+	AddMenu(feedAmPmMenu, 0, feedMenu, feedMinMenu, "Feed AM-PM: [<] Back", "AM PM", LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Feeder);
 
 	//clock menus
-	AddMenu(clockMenu, 0, clockMenu, mainMenu, "Clock: [<] Back", "Time", LCDMenu::RangeType::TimeLong);
-	AddMenu(clockMenu, 1, clockYearMenu, clockMenu, "Clock: [<] Back", "Set Clock Time", LCDMenu::RangeType::Nav);
-	AddMenu(clockYearMenu, 0, clockMonthMenu, clockMenu, "Clock: [<] Back", "Year", LCDMenu::RangeType::ClockYear);
-	AddMenu(clockMonthMenu, 0, clockDayMenu, clockYearMenu, "Clock: [<] Back", "Month", LCDMenu::RangeType::ClockMonth);
-	AddMenu(clockDayMenu, 0, clockMenu, clockMonthMenu, "Clock: [<] Back", "Day", LCDMenu::RangeType::ClockDay);
+	AddMenu(clockMenu, 0, clockMenu, mainMenu, "Clock: [<] Back", "Time", LCDMenu::RangeType::TimeLong, LCDMenu::MenuType::Clock);
+	AddMenu(clockMenu, 1, clockYearMenu, clockMenu, "Clock: [<] Back", "Set Clock Time", LCDMenu::RangeType::Nav, LCDMenu::MenuType::Clock);
+	AddMenu(clockYearMenu, 0, clockMonthMenu, clockMenu, "Clock: [<] Back", "Year", LCDMenu::RangeType::Year, LCDMenu::MenuType::Clock);
+	AddMenu(clockMonthMenu, 0, clockDayMenu, clockYearMenu, "Clock: [<] Back", "Month", LCDMenu::RangeType::Month, LCDMenu::MenuType::Clock);
+	AddMenu(clockDayMenu, 0, clockMenu, clockMonthMenu, "Clock: [<] Back", "Day", LCDMenu::RangeType::Day, LCDMenu::MenuType::Clock);
 
 
 	//currentMenu:0
@@ -92,7 +73,158 @@ void LCDMenuController::CreateMenus()
 
 
 }
+String^ LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
+{
 
+	if (rangeType == LCDMenu::RangeType::Frequency)
+	{
+		LimitRange(0, 1);
+		if (_optionCount <= 0)
+		{
+			return "Daily";
+		}
+		else if (_optionCount >= 1)
+		{
+			return "Every Other Day";
+		}
+
+	}
+	else if (rangeType == LCDMenu::RangeType::Hour)
+	{
+		LimitRange(0, 12);
+		//String hour = "01";
+		String^ hour = "01";
+		if (_optionCount <= _upperLimit && _optionCount >= _lowerLimit)
+		{
+			//hour = String(_optionCount);
+			hour = System::Convert::ToString(_optionCount);
+			if (_optionCount < 10)
+				hour = "0" + hour;
+		}
+		return hour;
+		//return StaticUtils::ParseString(hour);
+
+	}
+	else if (rangeType == LCDMenu::RangeType::Minute)
+	{
+		LimitRange(0, 59);
+
+		String^ minute = "01";
+		if (_optionCount <= _upperLimit && _optionCount >= _lowerLimit)
+		{
+			//hour = String(_optionCount);
+			minute = System::Convert::ToString(_optionCount);
+			if (_optionCount < 10)
+				minute = "0" + minute;
+		}
+		return minute;
+		//return StaticUtils::ParseString(minute);
+
+	}
+	else if (rangeType == LCDMenu::RangeType::AmPm)
+	{
+		LimitRange(0, 1);
+		if (_optionCount <= 1)
+			return "AM";
+		else
+			return "PM";
+	}
+	else if (rangeType == LCDMenu::RangeType::TimeFrequency)
+	{
+		//Daily, 08:30AM
+		return "Get From RTC";
+	}
+	else if (rangeType == LCDMenu::RangeType::Year)
+	{
+		LimitRange(2016, 2050);
+		String^ txt = "2016";
+		if (_optionCount <= _upperLimit && _optionCount >= _lowerLimit)
+		{
+			//hour = String(_optionCount);
+			txt = System::Convert::ToString(_optionCount);
+		}
+		return txt;
+		//return StaticUtils::ParseString(txt);
+	}
+	else if (rangeType == LCDMenu::RangeType::Month)
+	{
+		LimitRange(1, 12);
+		String^ txt = "01";
+		if (_optionCount <= _upperLimit && _optionCount >= _lowerLimit)
+		{
+			//hour = String(_optionCount);
+			txt = System::Convert::ToString(_optionCount);
+			if (_optionCount < 10)
+				txt = "0" + txt;
+		}
+		return txt;
+		//return StaticUtils::ParseString(txt);
+	}
+	else if (rangeType == LCDMenu::RangeType::Day)
+	{
+		LimitRange(1, 31);
+		String^ txt = "01";
+		if (_optionCount <= _upperLimit && _optionCount >= _lowerLimit)
+		{
+			//hour = String(_optionCount);
+			txt = System::Convert::ToString(_optionCount);
+			if (_optionCount < 10)
+				txt = "0" + txt;
+		}
+		return txt;
+		//return StaticUtils::ParseString(txt);
+	}
+	else
+		return "";
+
+
+}
+
+void LCDMenuController::SaveRangeOption(LCDMenu::RangeType rangeType, LCDMenu::MenuType menuType)
+{
+	//SerialExt::Debug("save", selectedMenu.OptionText);
+
+	if (rangeType == LCDMenu::RangeType::Frequency &&
+		menuType == LCDMenu::MenuType::Feeder)
+	{
+		if (_optionCount == 0) //Daily
+		{
+			RTCExt::SetFeedEvery(24);
+		}
+		else // ot day
+		{
+			RTCExt::SetFeedEvery(48);
+		}
+		
+	}
+	else if ((rangeType == LCDMenu::RangeType::Hour ||
+		rangeType == LCDMenu::RangeType::Minute ||
+		rangeType == LCDMenu::RangeType::AmPm) &&
+		(menuType == LCDMenu::MenuType::Feeder))
+	{
+		RTCExt::SetFeedNextRun(_optionCount, rangeType);
+	}
+	else if (rangeType == LCDMenu::RangeType::TimeFrequency)
+	{
+		//Daily, 08:30AM
+	}
+	else if ((rangeType == LCDMenu::RangeType::Year ||
+		rangeType == LCDMenu::RangeType::Month ||
+		rangeType == LCDMenu::RangeType::Day ||
+		rangeType == LCDMenu::RangeType::Hour ||
+		rangeType == LCDMenu::RangeType::Minute) &&
+		(menuType == LCDMenu::MenuType::Clock))
+	{
+		RTCExt::SetTimeTemp(_optionCount, rangeType);
+	}
+	else if (rangeType == LCDMenu::RangeType::AmPm &&
+		menuType == LCDMenu::MenuType::Clock)
+	{
+		RTCExt::SetTimeTemp(_optionCount, rangeType);
+		RTCExt::SetRTCTimeFromTemp();
+	}
+	
+}
 
 	//--Menu functions
 
@@ -125,6 +257,14 @@ void LCDMenuController::SetSelectedMenu(LCDMenu menu)
 
 }
 
+void LCDMenuController::PrintLine(short lineNum, String^ text)
+{
+	//T t(text);
+	//_lcd.setCursor(0, lineNum);
+	//_lcd.print(text);
+	StaticUtils::WriteLine(text);
+}
+
 
 void LCDMenuController::PrintMenu(LCDMenu menu)
 {
@@ -136,12 +276,12 @@ void LCDMenuController::PrintMenu(LCDMenu menu)
 	//String optionText = menu.OptionText;
 	String^ optionText = StaticUtils::ParseString(menu.OptionText);
 	
-	string rangeOptionText = GetRangeOption(menu.TheRangeType);
+	String^ rangeOptionText = GetRangeOption(menu.TheRangeType);
 
 	if (rangeOptionText != "")
 	{
-		//optionText = rangeOptionText;
-		optionText = StaticUtils::ParseString(rangeOptionText);
+		optionText = rangeOptionText;
+		//optionText = StaticUtils::ParseString(rangeOptionText);
 	}
 
 	StaticUtils::WriteLine(menu.Text);
@@ -150,11 +290,18 @@ void LCDMenuController::PrintMenu(LCDMenu menu)
 	//Clear();
 	//PrintLine(0, menu.Text);
 	//PrintLine(1, optionText);
-
-	//_rangeOptionText = "";
 }
 
+//template<typename T = void>
+//void Clear()
+//{
+//	_lcd.clear();
+//}
 
+/*int GetSize()
+{
+return MenuItems.size();
+}*/
 
 void LCDMenuController::SelectMainMenu()
 {
@@ -209,6 +356,8 @@ int LCDMenuController::GetKey()
 
 void LCDMenuController::LimitRange(int lower, int upper)
 {
+	_lowerLimit = lower;
+	_upperLimit = upper;
 	if (_optionCount <= lower)
 	{
 		_optionCount = lower; //limit
@@ -218,81 +367,6 @@ void LCDMenuController::LimitRange(int lower, int upper)
 		_optionCount = upper; //limit
 	}
 }
-
-string LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
-{
-	//auto selectedMenu = GetSelectedMenu();
-
-	switch (rangeType)
-	{
-	case LCDMenu::RangeType::FeedFrequency:
-	{
-		LimitRange(0, 1);
-		if (_optionCount <= 0)
-		{ 
-			return "Daily";
-		}
-		else if (_optionCount >= 1)
-		{
-			return "Every Other Day";
-		}
-
-	}
-	case LCDMenu::RangeType::FeedHour:
-	{
-		LimitRange(_hourLowerLimit, _hourUpperLimit);
-		//String hour = "01";
-		String^ hour = "01";
-		if (_optionCount <= _hourUpperLimit && _optionCount >= _hourLowerLimit)
-		{
-			//hour = String(_optionCount);
-			hour = System::Convert::ToString(_optionCount);
-			if (_optionCount < 10)
-				hour = "0" + hour;
-		}
-		/*return hour;*/
-		return StaticUtils::ParseString(hour);
-
-	}
-	case LCDMenu::RangeType::FeedMinute:
-	{
-		LimitRange(_minuteLowerLimit, _minuteUpperLimit);
-		//todo get feed time from RTC..
-		String^ minute = "01";
-		if (_optionCount <= _minuteUpperLimit && _optionCount >= _minuteLowerLimit)
-		{
-			//hour = String(_optionCount);
-			minute = System::Convert::ToString(_optionCount);
-			if (_optionCount < 10)
-				minute = "0" + minute;
-		}
-		/*return minute;*/
-		return StaticUtils::ParseString(minute);
-
-	}
-	case LCDMenu::RangeType::FeedAmPm:
-	{
-		LimitRange(0, 1);
-		if (_optionCount <= 1)
-			 return "AM";
-		else
-			return "PM";
-	}
-	case LCDMenu::RangeType::TimeFrequency:
-	{
-		//Daily, 08:30AM
-		 return "Get From RTC";
-	}
-	break;
-	default:
-		return "";
-		break;
-	}
-
-
-	//return selectedMenu;
-}
-
 
 void LCDMenuController::NextOption()
 {
@@ -359,58 +433,14 @@ void LCDMenuController::LeftButton()
 	PrintMenu(prevMenu);
 }
 
-void LCDMenuController::SaveRangeOption(LCDMenu::RangeType rangeType)
-{
-	//SerialExt::Debug("save", selectedMenu.OptionText);
-	
-	switch (rangeType)
-	{
-	case LCDMenu::RangeType::FeedFrequency:
-	{
-		if (_optionCount==0) //Daily
-		{
-			RTCExt::SetFeedEvery(24);
-		} 
-		else // ot day
-		{
-			RTCExt::SetFeedEvery(48);
-		}
-		break;
-	}
-	case LCDMenu::RangeType::FeedHour:
-	{
-		RTCExt::SetFeedNextRun(_optionCount, rangeType);
-	}
-	break;
-	case LCDMenu::RangeType::FeedMinute:
-	{
-		RTCExt::SetFeedNextRun(_optionCount, rangeType);
-	}
-	break;
-	case LCDMenu::RangeType::FeedAmPm:
-	{
-		RTCExt::SetFeedNextRun(_optionCount, rangeType);
-	}
-	break;
-	case LCDMenu::RangeType::TimeFrequency:
-	{
-		//Daily, 08:30AM
-		
-	}
-	break;
-	default:
-		break;
-	}
 
-	//return selectedMenu;
-}
 
 
 void LCDMenuController::SelectButton()
 {
 	
 	auto selectedMenu = GetSelectedMenu();
-	SaveRangeOption(selectedMenu.TheRangeType);
+	SaveRangeOption(selectedMenu.TheRangeType, selectedMenu.TheMenuType);
 	_optionCount = 0;
 
 	auto nextMenu = GetMenu(selectedMenu.NextMenuId, 0);
@@ -456,6 +486,19 @@ void LCDMenuController::CheckIfKeyPressed()
 
 	}
 	
+}
+void LCDMenuController::PrintTime()
+{
+	auto time = RTCExt::GetRTCTime();
+	//auto theMonth = month(time);
+
+	auto dateTimeString = RTCExt::GetShortDateTimeString(time);
+
+	//SerialExt::Debug("dtStringp", dateTimeString);
+
+	PrintLine(0, "Clock:");
+	PrintLine(1, dateTimeString);
+	//delay(_scrollDelay);
 }
 //template<typename T =void>
 void LCDMenuController::PrintFeedInfo()
