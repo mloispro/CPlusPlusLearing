@@ -98,6 +98,7 @@ namespace Controllers {
 		void CheckIfKeyPressed();
 		void PrintFeedInfo();
 		void PrintTime();
+		String^ GetTimeFrequency(LCDMenu::MenuType menuType);
 
 	};
 }

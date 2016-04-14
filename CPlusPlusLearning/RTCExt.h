@@ -48,7 +48,7 @@ namespace Utils {
 		static NextRunMemory NextDoseInfo;
 
 		//--dont copy to EAL-->
-#define EAL_DONT_COPY
+#pragma region EAL_DONT_COPY
 		
 		static int SECS_PER_MIN = 60;
 		static int SECS_PER_HOUR = 3600;
@@ -165,7 +165,7 @@ namespace Utils {
 		{
 			return now();
 		}
-#define EAL_DONT_COPY_END
+#pragma endregion EAL_DONT_COPY
 		//<--dont copy to EAL--
 
 		static DigitalTime _timeTemp(0, 0, 0);
@@ -294,11 +294,17 @@ namespace Utils {
 			//StaticUtils::Debug(runev);
 			//StaticUtils::WriteLine("rtcTime");
 			//StaticUtils::Debug(rtcTime);
+			
 
 			if (!IsRTCTimeSet() || runEvery == 0)
 			{
 				return;// rtcTime;
 			}
+
+			//auto rtc = GetShortDateTimeString(rtcTime);
+			//auto nr = GetShortDateTimeString(nextRun);
+			//auto cd = GetTimeRemainingString(countDown);
+			//auto re = GetTimeRemainingString(runEvery);
 
 			if (lastRun == 0)
 			{
@@ -321,11 +327,11 @@ namespace Utils {
 				countDown = 0;
 			}
 
-			//auto rtc = GetShortDateTimeString(rtcTime);
-			//auto nr = GetShortDateTimeString(nextRun);
-			//auto cd = GetTimeRemainingString(countDown);
-			//auto re = GetTimeRemainingString(runEvery);
-			//int tttt = 0;
+			
+		/*	auto nr2 = GetShortDateTimeString(nextRun);
+			auto cd2 = GetTimeRemainingString(countDown);
+			auto re2 = GetTimeRemainingString(runEvery);*/
+	
 
 			NextFeedInfo.RunEvery = runEvery;
 			NextFeedInfo.CountDown = countDown;
@@ -354,20 +360,49 @@ namespace Utils {
 			long sec = (long)(hour * SECS_PER_HOUR);
 			return sec;
 		}
+		template<typename T = void>
+		int ConvSecToHour(long seconds)
+		{
+			//T t(hour);
+			int h = (int)(seconds / SECS_PER_HOUR);
+			return h;
+		}
+
+		template<typename T = long, typename N = long>
+		String^ GetTimeFrequencyString(T&& runEvery, N&& nextRun)
+		{
+			String^ freq = "";
+			//auto dateTimeString = RTCExt::GetShortDateTimeString(time);
+
+			//long seconds = GetRTCTime() + runEvery;
+			
+			String^ am = "AM";
+			if (isPM(nextRun))
+				am = "PM";
+
+			String^ theTime = GetDigitalTimeString(nextRun);
+			theTime = theTime + am;
+
+			int h = ConvSecToHour(runEvery);
+
+			if (h == 24)
+				freq = ", Daily";
+			else if (h = 48)
+				freq = ", Every Other Day";
+			
+			String^ freqTime = theTime + freq;
+			return freqTime;
+		}
+
 		template<typename T>
 		void SetFeedEvery(T&& hour)
 		{
 			T t(hour);
 			auto sec = ConvHoursToSec(hour);
 			NextFeedInfo.RunEvery = sec;
+			NextFeedInfo.NextRun = 0; //need to set to 0 so it recalculates
 			UpdateNextFeed();
 		}
-		//template<typename T = void>
-		//void setTime(int hr, int min, int sec, int day, int month, int yr)
-		//{
-		//	tm tm;
-		//	tm.tm_hour = h;
-		//}
 		template<typename T=void>
 		void SetRTCTimeFromTemp()
 		{

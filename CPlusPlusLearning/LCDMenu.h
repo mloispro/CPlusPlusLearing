@@ -55,7 +55,7 @@ public:
 		//MenuItems();
 	}
 	LCDMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, RangeType rangeType) :
-		LCDMenu( id,  optionId,  nextMenuId,  prevMenuId,  text,  optionText,  rangeType, MenuType::Main)
+		LCDMenu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType, MenuType::Main)
 	{
 	}
 

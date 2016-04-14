@@ -106,11 +106,9 @@ void IsTimeToRun(int runTime, int expectedNextRun, int expectedRunCountDown){
 using namespace Controllers;
 
 template<typename T = void>
-void TestSetTimer(LCDMenuController menuController, long sleepSec){
-	
-	long sleep = sleepSec * 1000;
+void TestSetTimer(LCDMenuController menuController){
 
-	menuController._optionCount = 1;
+	menuController._optionCount = 0; //24
 	menuController.SaveRangeOption(LCDMenu::RangeType::Frequency, LCDMenu::MenuType::Feeder);
 
 	menuController._optionCount = 8;
@@ -119,19 +117,20 @@ void TestSetTimer(LCDMenuController menuController, long sleepSec){
 	menuController._optionCount = 42;
 	menuController.SaveRangeOption(LCDMenu::RangeType::Minute, LCDMenu::MenuType::Feeder);
 
-	menuController._optionCount = 1;
+	menuController._optionCount = 1;//PM
 	menuController.SaveRangeOption(LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Feeder);
 	menuController.PrintFeedInfo();
 
-	menuController._optionCount = 0;
+	menuController._optionCount = 1;//48
+	menuController.SaveRangeOption(LCDMenu::RangeType::Frequency, LCDMenu::MenuType::Feeder);
+
+	menuController._optionCount = 0;//AM
 	menuController.SaveRangeOption(LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Feeder);
 
-	menuController.PrintFeedInfo();
-	Thread::Sleep(sleep);
-	menuController.PrintFeedInfo();
-	Thread::Sleep(sleep);
-	menuController.PrintFeedInfo();
-	Thread::Sleep(sleep);
+	//auto feedfreq = menuController.GetMenu(menuController.feedFreqMenu, 0);
+	////menuController.SetSelectedMenu(feedfreq);
+	//menuController.PrintMenu(feedfreq);
+
 }
 
 template<typename T = void>
@@ -162,19 +161,22 @@ void TestSetClock(LCDMenuController menuController){
 template<typename T = void>
 int TestMenu()
 {
+	long sleep = 60 * 1000;
 
 	LCDMenuController menuController;
-	menuController.SelectMainMenu();
+	TestSetClock(menuController);
+	TestSetTimer(menuController);
+
 	menuController.PrintFeedInfo();
-
-	//RTCExt::NextFeedInfo.RunEvery = 8640000;
-	//RTCExt::SetFeedHour(24);
-	//long runEvery = RTCExt::NextFeedInfo.RunEvery;
-	//RTCExt::UpdateNextFeed();
-
-	//TestSetClock(menuController);
-
-	//TestSetTimer(menuController, 60);
+	menuController.SelectMainMenu();
+	
+	//for scroll outside main menu
+	menuController.PrintFeedInfo();
+	Thread::Sleep(sleep);
+	menuController.PrintFeedInfo();
+	Thread::Sleep(sleep);
+	menuController.PrintFeedInfo();
+	Thread::Sleep(sleep);
 
 	return 0;
 }
