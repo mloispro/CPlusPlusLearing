@@ -28,7 +28,8 @@ void LCDMenuController::CreateMenus()
 
 	//menus
 	AddMenu(mainMenu, 0, feedMenu, mainMenu, "Menu: [>] Exit", "Feeder", LCDMenu::RangeType::Nav);
-	AddMenu(mainMenu, 1, clockMenu, mainMenu, "Menu: [>] Exit", "Clock", LCDMenu::RangeType::Nav);
+	AddMenu(mainMenu, 1, doserMenu, mainMenu, "Menu: [>] Exit", "Doser", LCDMenu::RangeType::Nav);
+	AddMenu(mainMenu, 2, clockMenu, mainMenu, "Menu: [>] Exit", "Clock", LCDMenu::RangeType::Nav);
 
 	//feed menus
 	AddMenu(feedMenu, 0, feedTimeMenu, mainMenu, "Feeder: [<] Back", "Feed Time", LCDMenu::RangeType::Nav, LCDMenu::MenuType::Feeder);
@@ -39,51 +40,37 @@ void LCDMenuController::CreateMenus()
 	AddMenu(feedMinMenu, 0, feedAmPmMenu, feedHourMenu, "Feed Minute: [<] Back", "Minute", LCDMenu::RangeType::Minute, LCDMenu::MenuType::Feeder);
 	AddMenu(feedAmPmMenu, 0, feedTimeMenu, feedMinMenu, "Feed AM-PM: [<] Back", "AM PM", LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Feeder);
 
+	//doser menus
+	AddMenu(doserMenu, 0, doserTimeMenu, mainMenu, "Doser: [<] Back", "Doser Time", LCDMenu::RangeType::Nav, LCDMenu::MenuType::DryDoser);
+	AddMenu(doserMenu, 1, doserFreqMenu, mainMenu, "Doser: [<] Back", "Set Doser Time", LCDMenu::RangeType::Nav, LCDMenu::MenuType::DryDoser);
+	AddMenu(doserTimeMenu, 0, doserTimeMenu, doserMenu, "Doser Time: [<] Back", "Not Set", LCDMenu::RangeType::TimeFrequency, LCDMenu::MenuType::DryDoser);
+	AddMenu(doserFreqMenu, 0, doserHourMenu, doserMenu, "Doser Frequency: [<] Back", "Frequency", LCDMenu::RangeType::Frequency, LCDMenu::MenuType::DryDoser);
+	AddMenu(doserHourMenu, 0, doserMinMenu, doserFreqMenu, "Doser Hour: [<] Back", "Hour", LCDMenu::RangeType::Hour, LCDMenu::MenuType::DryDoser);
+	AddMenu(doserMinMenu, 0, doserAmPmMenu, doserHourMenu, "Doser Minute: [<] Back", "Minute", LCDMenu::RangeType::Minute, LCDMenu::MenuType::DryDoser);
+	AddMenu(doserAmPmMenu, 0, doserTimeMenu, doserMinMenu, "Doser AM-PM: [<] Back", "AM PM", LCDMenu::RangeType::AmPm, LCDMenu::MenuType::DryDoser);
+
 	//clock menus
 	AddMenu(clockMenu, 0, clockMenu, mainMenu, "Clock: [<] Back", "Time", LCDMenu::RangeType::TimeLong, LCDMenu::MenuType::Clock);
 	AddMenu(clockMenu, 1, clockYearMenu, clockMenu, "Clock: [<] Back", "Set Clock Time", LCDMenu::RangeType::Nav, LCDMenu::MenuType::Clock);
-	AddMenu(clockYearMenu, 0, clockMonthMenu, clockMenu, "Clock: [<] Back", "Year", LCDMenu::RangeType::Year, LCDMenu::MenuType::Clock);
-	AddMenu(clockMonthMenu, 0, clockDayMenu, clockYearMenu, "Clock: [<] Back", "Month", LCDMenu::RangeType::Month, LCDMenu::MenuType::Clock);
-	AddMenu(clockDayMenu, 0, clockMenu, clockMonthMenu, "Clock: [<] Back", "Day", LCDMenu::RangeType::Day, LCDMenu::MenuType::Clock);
-
-
-	//currentMenu:0
-	//currentItem:1
-
-	//currentMenu:1
-	//currentItem:0
-
-	//currentMenu:1
-	//currentItem:1
-
-	//[menus]
-	//Menu, Feeder 				menu:0 item:0 nextMenu:1 menuText:Menu itemText:Feeder rangeType:None isSelected:true
-	//Menu, Clock 				menu:0 item:1 nextMenu:5 menuText:Menu itemText:Clock rangeType:None isSelected:false
-	//Feeder, Feed Time 		menu:1 item:0 nextMenu:0 itemText:Feed Time rangeType:None isSelected:false
-	//Feeder, Set Feed Time 	menu:1 item:1 nextMenu:2 itemText:Set Feed Time rangeType:None isSelected:false
-	//Feed Frequency, Daily 	menu:2 item:0 nextMenu:3 itemText:Daily rangeType:FeedFrequency isSelected:false
-	//Feed Frequency, EO Day 	menu:2 item:1 nextMenu:3 itemText:Every Other Day rangeType:FeedFrequency isSelected:false
-	//Feed Hour, 06:00 AM 		menu:3 item:0 nextMenu:4 itemText:06:00 AM rangeType:Hour isSelected:false
-	//Feed Minute, 06:00 AM     menu:4 item:0 nextMenu:1 itemText:06:00 AM rangeType:Minute isSelected:false
-	//Clock, Clock Time 		menu:5 item:0 nextMenu:0 itemText:Clock Time rangeType:None isSelected:false
-	//Clock, Set Clock Time 	menu:5 item:1 nextMenu:6 itemText:Set Clock Time rangeType:None isSelected:false
-	//Clock Year, 2016 			menu:6 item:0 nextMenu:7 itemText:2016 rangeType:Year isSelected:false
-	//Clock Month, 04 			menu:7 item:0 nextMenu:8 itemText:04 rangeType:Month isSelected:false
-	//Clock Day, 09 			menu:8 item:0 nextMenu:-1 itemText:09 rangeType:Day isSelected:false
-
+	AddMenu(clockYearMenu, 0, clockMonthMenu, clockMenu, "Clock Year: [<] Back", "Year", LCDMenu::RangeType::Year, LCDMenu::MenuType::Clock);
+	AddMenu(clockMonthMenu, 0, clockDayMenu, clockYearMenu, "Clock Month: [<] Back", "Month", LCDMenu::RangeType::Month, LCDMenu::MenuType::Clock);
+	AddMenu(clockDayMenu, 0, clockHourMenu, clockMonthMenu, "Clock Day: [<] Back", "Day", LCDMenu::RangeType::Day, LCDMenu::MenuType::Clock);
+	AddMenu(clockHourMenu, 0, clockMinMenu, clockDayMenu, "Clock Hour: [<] Back", "", LCDMenu::RangeType::Hour, LCDMenu::MenuType::Clock);
+	AddMenu(clockMinMenu, 0, clockAmPmMenu, clockHourMenu, "Clock Min: [<] Back", "", LCDMenu::RangeType::Minute, LCDMenu::MenuType::Clock);
+	AddMenu(clockAmPmMenu, 0, clockMenu, clockMinMenu, "Clock AM-PM: [<] Back", "", LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Clock);
 
 }
-String^ LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
+String^ LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType, LCDMenu::MenuType menuType)
 {
 
 	if (rangeType == LCDMenu::RangeType::Frequency)
 	{
 		LimitRange(0, 1);
-		if (_optionCount <= 0)
+		if (_optionCount <= _lowerLimit)
 		{
 			return "Daily";
 		}
-		else if (_optionCount >= 1)
+		else if (_optionCount >= _upperLimit)
 		{
 			return "Every Other Day";
 		}
@@ -124,16 +111,22 @@ String^ LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType)
 	else if (rangeType == LCDMenu::RangeType::AmPm)
 	{
 		LimitRange(0, 1);
-		if (_optionCount < _upperLimit)
-			return "AM";
-		else
+		if (_optionCount <= _lowerLimit)
 			return "PM";
+		else if (_optionCount >= _upperLimit)
+			return "AM";
 	}
 	else if (rangeType == LCDMenu::RangeType::TimeFrequency)
 	{
 		//Daily, 08:30AM
-		String^ freq = GetTimeFrequency(LCDMenu::MenuType::Feeder);
+		String^ freq = GetTimeFrequency(menuType);
 		return freq;
+	}
+	else if (rangeType == LCDMenu::RangeType::TimeLong)
+	{
+		// 03/04/2016 08:30AM
+		String^ time = GetTimeLong(menuType);
+		return time;
 	}
 	else if (rangeType == LCDMenu::RangeType::Year)
 	{
@@ -186,24 +179,26 @@ void LCDMenuController::SaveRangeOption(LCDMenu::RangeType rangeType, LCDMenu::M
 	//SerialExt::Debug("save", selectedMenu.OptionText);
 
 	if (rangeType == LCDMenu::RangeType::Frequency &&
-		menuType == LCDMenu::MenuType::Feeder)
+		(menuType == LCDMenu::MenuType::Feeder ||
+		menuType == LCDMenu::MenuType::DryDoser))
 	{
 		if (_optionCount == 0) //Daily
 		{
-			RTCExt::SetFeedEvery(24);
+			RTCExt::SetRunEvery(24, menuType);
 		}
 		else // ot day
 		{
-			RTCExt::SetFeedEvery(48);
+			RTCExt::SetRunEvery(48, menuType);
 		}
 		
 	}
 	else if ((rangeType == LCDMenu::RangeType::Hour ||
 		rangeType == LCDMenu::RangeType::Minute ||
 		rangeType == LCDMenu::RangeType::AmPm) &&
-		(menuType == LCDMenu::MenuType::Feeder))
+		(menuType == LCDMenu::MenuType::Feeder ||
+		menuType == LCDMenu::MenuType::DryDoser))
 	{
-		RTCExt::SetFeedNextRun(_optionCount, rangeType);
+		RTCExt::SetNextRun(_optionCount, rangeType, menuType);
 	}
 	else if (rangeType == LCDMenu::RangeType::TimeFrequency)
 	{
@@ -277,7 +272,7 @@ void LCDMenuController::PrintMenu(LCDMenu menu)
 	//String optionText = menu.OptionText;
 	String^ optionText = StaticUtils::ParseString(menu.OptionText);
 	
-	String^ rangeOptionText = GetRangeOption(menu.TheRangeType);
+	String^ rangeOptionText = GetRangeOption(menu.TheRangeType, menu.TheMenuType);
 
 	if (rangeOptionText != "")
 	{
@@ -350,7 +345,7 @@ int LCDMenuController::GetKey()
 	//int key = GetKeyFromVal(keyVal);
 	//SerialExt::Debug("key", key);
 	
-	int key = StaticUtils::ReadKey();
+	int key = StaticUtils::ReadMenuKey();
 
 	return key;
 }
@@ -502,40 +497,76 @@ void LCDMenuController::PrintTime()
 	//delay(_scrollDelay);
 }
 //template<typename T =void>
-void LCDMenuController::PrintFeedInfo()
+void LCDMenuController::PrintRunInfo(LCDMenu::MenuType menuType)
 {
+	String^ label;
+	if (menuType == LCDMenu::MenuType::Feeder){
+		label = "Feed";
+		if (RTCExt::NextFeedInfo.RunEvery == 0){
+			PrintLine(0, label + " Not Set");
+			return;
+		}
+	}
+	else if (menuType == LCDMenu::MenuType::DryDoser){
+		label = "Dose";
+		if (RTCExt::NextDoseInfo.RunEvery == 0){
+			PrintLine(0, label + " Not Set");
+			return;
+		}
+	}
+
 	for (int i = 0; i <= 3; i++)
 	{
-		RTCExt::UpdateNextFeed();
+		RTCExt::UpdateNextRun(menuType);
 
-		String^ nextFeed;
-		String^ lastFeed;
+		String^ nextRun;
+		String^ lastRun;
 		String^ countDown;
+
+		if (menuType == LCDMenu::MenuType::Feeder){
+			lastRun = RTCExt::GetShortDateTimeString(RTCExt::NextFeedInfo.LastRun);
+			countDown = RTCExt::GetTimeRemainingString(RTCExt::NextFeedInfo.CountDown);
+			nextRun = RTCExt::GetShortDateTimeString(RTCExt::NextFeedInfo.NextRun);
+		}
+		else if (menuType == LCDMenu::MenuType::DryDoser){
+			lastRun = RTCExt::GetShortDateTimeString(RTCExt::NextDoseInfo.LastRun);
+			countDown = RTCExt::GetTimeRemainingString(RTCExt::NextDoseInfo.CountDown);
+			nextRun = RTCExt::GetShortDateTimeString(RTCExt::NextDoseInfo.NextRun);
+		}
 
 		switch (i) {
 		case 0:
-			lastFeed = RTCExt::GetShortDateTimeString(RTCExt::NextFeedInfo.LastRun);
-
-			PrintLine(0, "Last Feed:");
-			PrintLine(1, lastFeed);
+			PrintLine(0, label + " Last Run:");
+			PrintLine(1, lastRun);
 			break;
 		case 1:
-			countDown = RTCExt::GetTimeRemainingString(RTCExt::NextFeedInfo.CountDown);
-
-			PrintLine(0, "Count Down:");
+			PrintLine(0, label + " Count Down:");
 			PrintLine(1, countDown);
 			break;
 		case 2:
-			nextFeed = RTCExt::GetShortDateTimeString(RTCExt::NextFeedInfo.NextRun);
-
-			PrintLine(0, "Next Feed:");
-			PrintLine(1, nextFeed);
+			PrintLine(0, label + " Next Run:");
+			PrintLine(1, nextRun);
 			break;
 		default:
 			break;
 		}
 		//delay(_scrollDelay);
 	}
+}
+
+
+String^ LCDMenuController::GetTimeLong(LCDMenu::MenuType menuType)
+{
+	long time;
+
+	if (menuType == LCDMenu::MenuType::Clock)
+	{
+		time = RTCExt::GetRTCTime();
+	}
+
+	String^ timeString = RTCExt::GetShortDateTimeString(time);
+	return timeString;
+
 }
 
 String^ LCDMenuController::GetTimeFrequency(LCDMenu::MenuType menuType)
@@ -548,6 +579,14 @@ String^ LCDMenuController::GetTimeFrequency(LCDMenu::MenuType menuType)
 		runEvery = RTCExt::NextFeedInfo.RunEvery;
 		nextRun = RTCExt::NextFeedInfo.NextRun;
 	}
+	else if (menuType == LCDMenu::MenuType::DryDoser)
+	{
+		runEvery = RTCExt::NextDoseInfo.RunEvery;
+		nextRun = RTCExt::NextDoseInfo.NextRun;
+	}
+
+	if (runEvery <= 0)
+		return "Not Set";
 
 	String^ freqTime = RTCExt::GetTimeFrequencyString(runEvery, nextRun);
 	return freqTime;

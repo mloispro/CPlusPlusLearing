@@ -43,12 +43,18 @@ namespace Controllers {
 		const short clockMonthMenu = 8;
 		const short clockDayMenu = 9;
 		const short feedTimeMenu = 10;
+		const short clockHourMenu = 11;
+		const short clockMinMenu = 12;
+		const short clockAmPmMenu = 13;
+		const short doserMenu = 14;
+		const short doserFreqMenu = 15;
+		const short doserHourMenu = 16;
+		const short doserMinMenu = 17;
+		const short doserAmPmMenu = 18;
+		const short doserTimeMenu = 19;
 
 		int _lowerLimit;
 		int _upperLimit;
-		
-		//bool _accessingMenu = false;
-		//bool _menuChanged = false;
 
 		int _keyValues[5];
 		int _numOfKeys = 5;
@@ -56,7 +62,6 @@ namespace Controllers {
 		
 		short _selectedMenuId = -1;
 		short _selectedOptionId = -1;
-		//string _rangeOptionText;
 		
 		//LiquidCrystal _lcd(8, 9, 4, 5, 6, 7);
 		
@@ -66,14 +71,12 @@ namespace Controllers {
 		int _optionCount;
 
 		LCDMenuController();
-		
 		LCDMenu GetSelectedMenu();
 		void SetSelectedMenu(LCDMenu menu);
-		//template<typename T>
 		void PrintLine(short lineNum, String^ text);
 		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType);
 		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, LCDMenu::MenuType menuType);
-		String^ GetRangeOption(LCDMenu::RangeType rangeType);
+		String^ GetRangeOption(LCDMenu::RangeType rangeType, LCDMenu::MenuType menuType);
 		void SaveRangeOption(LCDMenu::RangeType rangeType, LCDMenu::MenuType menuType);
 		
 		void CreateMenus();
@@ -96,9 +99,10 @@ namespace Controllers {
 		
 		void SelectButton();
 		void CheckIfKeyPressed();
-		void PrintFeedInfo();
+		void PrintRunInfo(LCDMenu::MenuType menuType);
 		void PrintTime();
 		String^ GetTimeFrequency(LCDMenu::MenuType menuType);
+		String^ GetTimeLong(LCDMenu::MenuType menuType);
 
 	};
 }
@@ -108,42 +112,6 @@ namespace Controllers {
 //	_lcd.clear();
 //}
 
-/*int GetSize()
-{
-return MenuItems.size();
-}*/
-////template<typename T = void>
-////void PrintMenu()
-////{
-////	SerialExt::Debug("PrintMenu1");
-////	if (!_menuChanged)
-////		return;
-
-////	_menuChanged = false;
-
-////	SerialExt::Debug("PrintMenu2");
-
-////	LCDMenu menu = GetSelectedMenu();
-////	
-////	SerialExt::Debug("menu", menu.Text);
-////	SerialExt::Debug("option", menu.OptionText);
-
-////	Clear();
-////	PrintLine(0, menu.Text);
-////	PrintLine(1, menu.OptionText);
-////}
-////template<typename T = void>
-////void SelectMenuOption()
-////{
-////	
-////	auto& selectedMenu = GetSelectedMenu();
-////	LCDMenu& nextMenu = Menus[selectedMenu.NextMenuId];
-
-////	selectedMenu.IsSelected = false;
-////	nextMenu.IsSelected = true;
-////	_menuChanged = true;
-////
-////}
 
 #endif
 

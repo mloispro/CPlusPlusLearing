@@ -150,14 +150,17 @@ namespace Utils {
 			time_t t = time(NULL);
 			tm timePtr;
 			localtime_s(&timePtr, &t);
-			timePtr.tm_hour = theHour;
+			timePtr.tm_hour = theHour+1;
 			timePtr.tm_min = theMinute;
 			timePtr.tm_sec = theSecond;
 			timePtr.tm_mday = theDay;
-			timePtr.tm_mon = theMonth;
+			timePtr.tm_mon = theMonth-1;
 			timePtr.tm_year = theYear - 1900;
 			
 			_rtcTime = mktime(&timePtr);
+
+			//setTime(theHour, theMinute, theSecond, theDay, theMonth, theYear);
+			//RTC.set(now());
 
 		}
 		template<typename T = void>
@@ -279,14 +282,28 @@ namespace Utils {
 			if (theYear < 2016)return false;
 			return true;
 		}
-		template<typename T = void>
-		void UpdateNextFeed(){
+		template<typename T = LCDMenu::MenuType>
+		void UpdateNextRun(T&& menuType){
 
 			auto rtcTime = GetRTCTime();
-			auto runEvery = NextFeedInfo.RunEvery;
-			auto countDown = NextFeedInfo.CountDown;
-			auto nextRun = NextFeedInfo.NextRun;
-			auto lastRun = NextFeedInfo.LastRun;
+
+			long runEvery = 0;
+			long countDown = 0;
+			long nextRun = 0;
+			long lastRun = 0;
+
+			if (menuType == LCDMenu::MenuType::Feeder){
+				runEvery = NextFeedInfo.RunEvery;
+				countDown = NextFeedInfo.CountDown;
+				nextRun = NextFeedInfo.NextRun;
+				lastRun = NextFeedInfo.LastRun;
+			}
+			else if (menuType == LCDMenu::MenuType::DryDoser){
+				runEvery = NextDoseInfo.RunEvery;
+				countDown = NextDoseInfo.CountDown;
+				nextRun = NextDoseInfo.NextRun;
+				lastRun = NextDoseInfo.LastRun;
+			}
 
 			//auto runev = GetDigitalTimeString(runEvery);
 			////StaticUtils::Debug(runEvery);
@@ -333,10 +350,18 @@ namespace Utils {
 			auto re2 = GetTimeRemainingString(runEvery);*/
 	
 
-			NextFeedInfo.RunEvery = runEvery;
-			NextFeedInfo.CountDown = countDown;
-			NextFeedInfo.NextRun = nextRun;
-			NextFeedInfo.LastRun = lastRun;
+			if (menuType == LCDMenu::MenuType::Feeder){
+				NextFeedInfo.RunEvery = runEvery;
+				NextFeedInfo.CountDown = countDown;
+				NextFeedInfo.NextRun = nextRun;
+				NextFeedInfo.LastRun = lastRun;
+			}
+			else if (menuType == LCDMenu::MenuType::DryDoser){
+				NextDoseInfo.RunEvery = runEvery;
+				NextDoseInfo.CountDown = countDown;
+				NextDoseInfo.NextRun = nextRun;
+				NextDoseInfo.LastRun = lastRun;
+			}
 
 		}
 
@@ -372,10 +397,7 @@ namespace Utils {
 		String^ GetTimeFrequencyString(T&& runEvery, N&& nextRun)
 		{
 			String^ freq = "";
-			//auto dateTimeString = RTCExt::GetShortDateTimeString(time);
 
-			//long seconds = GetRTCTime() + runEvery;
-			
 			String^ am = "AM";
 			if (isPM(nextRun))
 				am = "PM";
@@ -394,14 +416,20 @@ namespace Utils {
 			return freqTime;
 		}
 
-		template<typename T>
-		void SetFeedEvery(T&& hour)
+		template<typename T = long, typename M = LCDMenu::MenuType>
+		void SetRunEvery(T&& hour, M&& menuType)
 		{
 			T t(hour);
 			auto sec = ConvHoursToSec(hour);
-			NextFeedInfo.RunEvery = sec;
-			NextFeedInfo.NextRun = 0; //need to set to 0 so it recalculates
-			UpdateNextFeed();
+			if (menuType == LCDMenu::MenuType::Feeder){
+				NextFeedInfo.RunEvery = sec;
+				NextFeedInfo.NextRun = 0; //need to set to 0 so it recalculates
+			}
+			else if (menuType == LCDMenu::MenuType::DryDoser){
+				NextDoseInfo.RunEvery = sec;
+				NextDoseInfo.NextRun = 0; //need to set to 0 so it recalculates
+			}
+			UpdateNextRun(menuType);
 		}
 		template<typename T=void>
 		void SetRTCTimeFromTemp()
@@ -435,13 +463,19 @@ namespace Utils {
 
 			
 		}
-		template<typename T, typename M = LCDMenu::RangeType>
-		void SetFeedNextRun(T&& val, M&& rangeType)
+		template<typename T, typename M = LCDMenu::RangeType, typename P = LCDMenu::MenuType>
+		void SetNextRun(T&& val, M&& rangeType, P&& menuType)
 		{
 			T t(val);
 
 			tm timePtr;
-			auto nrTime = time_t(NextFeedInfo.NextRun);
+			time_t nrTime;
+
+			if (menuType==LCDMenu::MenuType::Feeder)
+				nrTime = time_t(NextFeedInfo.NextRun);
+			else if (menuType == LCDMenu::MenuType::DryDoser)
+				nrTime = time_t(NextDoseInfo.NextRun);
+
 			localtime_s(&timePtr, &nrTime);
 
 			if (rangeType == LCDMenu::RangeType::Minute)
@@ -450,18 +484,23 @@ namespace Utils {
 				timePtr.tm_hour = val;
 			else if (rangeType == LCDMenu::RangeType::AmPm)
 			{
-				if (val == 1 && timePtr.tm_hour < 12) //PM
-					timePtr.tm_hour = timePtr.tm_hour + 12;
-				else if (val == 0 && timePtr.tm_hour > 12)//AM
+			
+				if (val == 1 && timePtr.tm_hour > 12) //PM
 					timePtr.tm_hour = timePtr.tm_hour - 12;
+				else if (val == 0 && timePtr.tm_hour < 12)//AM
+					timePtr.tm_hour = timePtr.tm_hour + 12;
 			}
 			else
 				return;
 
 			auto newNrTime = mktime(&timePtr);
 
-			NextFeedInfo.NextRun = newNrTime;
-			UpdateNextFeed();
+			if (menuType == LCDMenu::MenuType::Feeder)
+				NextFeedInfo.NextRun = newNrTime;
+			else if (menuType == LCDMenu::MenuType::DryDoser)
+				NextDoseInfo.NextRun = newNrTime;
+
+			UpdateNextRun(menuType);
 		}
 		template<typename T = time_t>
 		DigitalTime GetTimeRemaining(T&& seconds){

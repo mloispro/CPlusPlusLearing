@@ -113,7 +113,7 @@ namespace Utils {
 			return val;
 		}
 		template<typename T = void>
-		int ReadKey()
+		int ReadMenuKey()
 		{
 			int key = -1;
 			ConsoleKeyInfo cki;
@@ -138,7 +138,7 @@ namespace Utils {
 					key = 4;
 					break;
 				}
-				Console::WriteLine("Key: " + cki.Key.ToString());
+				//Console::WriteLine("Key: " + cki.Key.ToString());
 				return key;
 			} while (cki.Key != ConsoleKey::Escape);
 

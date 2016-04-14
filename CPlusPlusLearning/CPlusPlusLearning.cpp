@@ -119,7 +119,7 @@ void TestSetTimer(LCDMenuController menuController){
 
 	menuController._optionCount = 1;//PM
 	menuController.SaveRangeOption(LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Feeder);
-	menuController.PrintFeedInfo();
+	menuController.PrintRunInfo(LCDMenu::MenuType::Feeder);
 
 	menuController._optionCount = 1;//48
 	menuController.SaveRangeOption(LCDMenu::RangeType::Frequency, LCDMenu::MenuType::Feeder);
@@ -167,15 +167,15 @@ int TestMenu()
 	TestSetClock(menuController);
 	TestSetTimer(menuController);
 
-	menuController.PrintFeedInfo();
+	menuController.PrintRunInfo(LCDMenu::MenuType::Feeder);
 	menuController.SelectMainMenu();
 	
 	//for scroll outside main menu
-	menuController.PrintFeedInfo();
+	menuController.PrintRunInfo(LCDMenu::MenuType::Feeder);
 	Thread::Sleep(sleep);
-	menuController.PrintFeedInfo();
+	menuController.PrintRunInfo(LCDMenu::MenuType::Feeder);
 	Thread::Sleep(sleep);
-	menuController.PrintFeedInfo();
+	menuController.PrintRunInfo(LCDMenu::MenuType::Feeder);
 	Thread::Sleep(sleep);
 
 	return 0;
