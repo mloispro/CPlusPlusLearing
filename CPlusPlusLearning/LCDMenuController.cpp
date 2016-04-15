@@ -112,9 +112,9 @@ String^ LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType, LCDMenu:
 	{
 		LimitRange(0, 1);
 		if (_optionCount <= _lowerLimit)
-			return "PM";
-		else if (_optionCount >= _upperLimit)
 			return "AM";
+		else if (_optionCount >= _upperLimit)
+			return "PM";
 	}
 	else if (rangeType == LCDMenu::RangeType::TimeFrequency)
 	{
@@ -494,6 +494,7 @@ void LCDMenuController::PrintTime()
 
 	PrintLine(0, "Clock:");
 	PrintLine(1, dateTimeString);
+
 	//delay(_scrollDelay);
 }
 //template<typename T =void>

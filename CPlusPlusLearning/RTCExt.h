@@ -1,6 +1,8 @@
 #ifndef RTCEXT_h
 #define RTCEXT_h
 
+#include <inttypes.h>
+#include <sys/types.h>
 #include <time.h> 
 
 //#include <StandardCplusplus.h>
@@ -38,6 +40,16 @@ namespace Utils {
 		DigitalTime(int hours, int minutes, int seconds) : Hours(hours), Minutes(minutes), Seconds(seconds){}
 	};
 
+	//struct tmElements_t{
+	//	
+	//	uint32_t Hour;
+	//	uint32_t Minute;
+	//	uint32_t Second;
+	//	uint32_t Day;
+	//	uint32_t Month;
+	//	uint32_t Year;
+	//	uint32_t Wday;
+	//};
 
 	////remeber: dependant functions must be defined first in namespace.
 	///**Better to use template functions.
@@ -50,6 +62,9 @@ namespace Utils {
 		//--dont copy to EAL-->
 #pragma region EAL_DONT_COPY
 		
+#define LEAP_YEAR(Y)     ( ((1970+Y)>0) && !((1970+Y)%4) && ( ((1970+Y)%100) || !((1970+Y)%400) ) )
+
+		static  const uint8_t monthDays[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }; // API starts months from 1, this array starts from 0
 		static int SECS_PER_MIN = 60;
 		static int SECS_PER_HOUR = 3600;
 		static int SECS_PER_DAY = 86400;
@@ -143,24 +158,157 @@ namespace Utils {
 		bool isPM(time_t t) { // returns true if PM
 			return (hour(t) >= 12);
 		}
-		
+		//static tmElements_t _tmElements;          // a cache of time elements
+		//template<typename T = void>
+		//time_t makeTime(tmElements_t &tm){
+		//	// assemble time elements into time_t 
+		//	// note year argument is offset from 1970 (see macros in time.h to convert to other formats)
+		//	// previous version used full four digit year (or digits since 2000),i.e. 2009 was 2009 or 9
+
+		//	int i;
+		//	uint32_t seconds;
+
+		//	// seconds from 1970 till 1 jan 00:00:00 of the given year
+		//	seconds = tm.Year*(SECS_PER_DAY * 365);
+		//	for (i = 0; i < tm.Year; i++) {
+		//		if (LEAP_YEAR(i)) {
+		//			seconds += SECS_PER_DAY;   // add extra days for leap years
+		//		}
+		//	}
+
+		//	// add days for this year, months start from 1
+		//	for (i = 1; i < tm.Month; i++) {
+		//		if ((i == 2) && LEAP_YEAR(tm.Year)) {
+		//			seconds += SECS_PER_DAY * 29;
+		//		}
+		//		else {
+		//			seconds += SECS_PER_DAY * monthDays[i - 1];  //monthDay array starts from 0
+		//		}
+		//	}
+		//	seconds += (tm.Day - 1) * SECS_PER_DAY;
+		//	seconds += tm.Hour * SECS_PER_HOUR;
+		//	seconds += tm.Minute * SECS_PER_MIN;
+		//	seconds += tm.Second;
+		//	return (time_t)seconds;
+		//}
+		//template<typename T = void>
+		//void breakTime(time_t timeInput, tmElements_t &tm){
+		//	// break the given time_t into time components
+		//	// this is a more compact version of the C library localtime function
+		//	// note that year is offset from 1970 !!!
+
+		//	uint8_t year;
+		//	uint8_t month, monthLength;
+		//	uint32_t time;
+		//	unsigned long days;
+
+		//	time = (uint32_t)timeInput;
+		//	tm.Second = time % 60;
+		//	time /= 60; // now it is minutes
+		//	tm.Minute = time % 60;
+		//	time /= 60; // now it is hours
+		//	tm.Hour = time % 24;
+		//	time /= 24; // now it is days
+		//	tm.Wday = ((time + 4) % 7) + 1;  // Sunday is day 1 
+
+		//	year = 0;
+		//	days = 0;
+		//	while ((unsigned)(days += (LEAP_YEAR(year) ? 366 : 365)) <= time) {
+		//		year++;
+		//	}
+		//	tm.Year = year; // year is offset from 1970 
+
+		//	days -= LEAP_YEAR(year) ? 366 : 365;
+		//	time -= days; // now it is days in this year, starting at 0
+
+		//	days = 0;
+		//	month = 0;
+		//	monthLength = 0;
+		//	for (month = 0; month<12; month++) {
+		//		if (month == 1) { // february
+		//			if (LEAP_YEAR(year)) {
+		//				monthLength = 29;
+		//			}
+		//			else {
+		//				monthLength = 28;
+		//			}
+		//		}
+		//		else {
+		//			monthLength = monthDays[month];
+		//		}
+
+		//		if (time >= monthLength) {
+		//			time -= monthLength;
+		//		}
+		//		else {
+		//			break;
+		//		}
+		//	}
+		//	tm.Month = month + 1;  // jan is month 1  
+		//	tm.Day = time + 1;     // day of month
+		//}
+		//template<typename T = void>
+		//void RCset(time_t t)
+		//{
+		//	tmElements_t tm;
+
+		//	breakTime(t, tm);
+		//	
+		//}
+		//template<typename T = void>
+		//void setTime(time_t t) {
+
+		//	//_rtcTime = (uint32_t)t;
+		//	_rtcTime = t;
+		//	
+		//}
+		//template<typename T = void>
+		//void setTime(int hr, int min, int sec, int dy, int mnth, int yr){
+		//	// year can be given as full four digit year or two digts (2010 or 10 for 2010);  
+		//	//it is converted to years since 1970
+		//	if (yr > 99)
+		//		yr = yr - 1970;
+		//	else
+		//		yr += 30;
+		//	_tmElements.Year = yr;
+		//	_tmElements.Month = mnth;
+		//	_tmElements.Day = dy;
+		//	_tmElements.Hour = hr;
+		//	_tmElements.Minute = min;
+		//	_tmElements.Second = sec;
+		//	setTime(makeTime(_tmElements));
+		//}
+
 		template<typename T = void>
 		void SetRTCTime(int theHour, int theMinute, int theSecond, int theDay, int theMonth, int theYear)
 		{
+			//12/31/2025 12:59PM
+			//!12/31/2025 11:59AM
+			int hourAdd = 0;
+			if (theHour < 12){
+				hourAdd = 1;
+			}
+
 			time_t t = time(NULL);
 			tm timePtr;
 			localtime_s(&timePtr, &t);
-			timePtr.tm_hour = theHour+1;
+			timePtr.tm_hour = theHour + hourAdd;
 			timePtr.tm_min = theMinute;
 			timePtr.tm_sec = theSecond;
 			timePtr.tm_mday = theDay;
-			timePtr.tm_mon = theMonth-1;
+			timePtr.tm_mon = theMonth - 1;
 			timePtr.tm_year = theYear - 1900;
 			
 			_rtcTime = mktime(&timePtr);
 
+			
+
 			//setTime(theHour, theMinute, theSecond, theDay, theMonth, theYear);
+			
 			//RTC.set(now());
+
+			//todo:remove
+			//String^ t2 = GetShortDateTimeString(_rtcTime); //01/23/2024 12:54AM, !01/22/2024 11:54PM, !02/23/2024 11:54AM
 
 		}
 		template<typename T = void>
@@ -442,6 +590,9 @@ namespace Utils {
 		{
 			T t(val);
 
+			//TODO: remove
+			DigitalTime dt(0, 0, 0);
+
 			if (rangeType == LCDMenu::RangeType::Year)
 				_timeTemp.Year = val;
 			else if (rangeType == LCDMenu::RangeType::Month)
@@ -454,19 +605,21 @@ namespace Utils {
 				_timeTemp.Minutes = val;
 			else if (rangeType == LCDMenu::RangeType::AmPm)
 			{
-				if (val == 1 && _timeTemp.Hours > 12) //PM
-					_timeTemp.Hours = _timeTemp.Hours - 12;
-				else if (val == 0 && _timeTemp.Hours < 12)//AM
+				
+				if (val == 0 && _timeTemp.Hours == 12) // val = 0->AM
+					_timeTemp.Hours = 0;
+				else if (val == 1 && _timeTemp.Hours == 12) // val = 1->PM
+					_timeTemp.Hours = 23;
+				else if (val == 1 && _timeTemp.Hours < 12)// val = 1->PM
 					_timeTemp.Hours = _timeTemp.Hours + 12;
 			}
-				//_timeTemp.Seconds = val;
-
-			
 		}
 		template<typename T, typename M = LCDMenu::RangeType, typename P = LCDMenu::MenuType>
 		void SetNextRun(T&& val, M&& rangeType, P&& menuType)
 		{
 			T t(val);
+			M m(rangeType);
+			P p(menuType);
 
 			tm timePtr;
 			time_t nrTime;
@@ -484,10 +637,11 @@ namespace Utils {
 				timePtr.tm_hour = val;
 			else if (rangeType == LCDMenu::RangeType::AmPm)
 			{
+				int tmHour = timePtr.tm_hour;
 			
-				if (val == 1 && timePtr.tm_hour > 12) //PM
+				if (val == 0 && timePtr.tm_hour > 12) //AM
 					timePtr.tm_hour = timePtr.tm_hour - 12;
-				else if (val == 0 && timePtr.tm_hour < 12)//AM
+				else if (val == 1 && timePtr.tm_hour < 12)//PM
 					timePtr.tm_hour = timePtr.tm_hour + 12;
 			}
 			else

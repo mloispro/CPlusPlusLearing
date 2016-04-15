@@ -105,56 +105,51 @@ void IsTimeToRun(int runTime, int expectedNextRun, int expectedRunCountDown){
 
 using namespace Controllers;
 
-template<typename T = void>
-void TestSetTimer(LCDMenuController menuController){
 
-	menuController._optionCount = 0; //24
+template<typename T = void>
+//freq,h,min,am - am=0,pm=1 -> [am=0,pm=1]
+String^ TestSetTimer(LCDMenuController menuController, int freq, int hour, int min, int amPm ){
+
+	menuController._optionCount = freq; //0=24, 1=48
 	menuController.SaveRangeOption(LCDMenu::RangeType::Frequency, LCDMenu::MenuType::Feeder);
 
-	menuController._optionCount = 8;
+	menuController._optionCount = hour;
 	menuController.SaveRangeOption(LCDMenu::RangeType::Hour, LCDMenu::MenuType::Feeder);
 
-	menuController._optionCount = 42;
+	menuController._optionCount = min;
 	menuController.SaveRangeOption(LCDMenu::RangeType::Minute, LCDMenu::MenuType::Feeder);
 
-	menuController._optionCount = 1;//PM
+	menuController._optionCount = amPm;//0=am,1=PM
 	menuController.SaveRangeOption(LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Feeder);
-	menuController.PrintRunInfo(LCDMenu::MenuType::Feeder);
+	
+	return menuController.GetTimeFrequency(LCDMenu::MenuType::Feeder);
 
-	menuController._optionCount = 1;//48
-	menuController.SaveRangeOption(LCDMenu::RangeType::Frequency, LCDMenu::MenuType::Feeder);
-
-	menuController._optionCount = 0;//AM
-	menuController.SaveRangeOption(LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Feeder);
-
-	//auto feedfreq = menuController.GetMenu(menuController.feedFreqMenu, 0);
-	////menuController.SetSelectedMenu(feedfreq);
-	//menuController.PrintMenu(feedfreq);
 
 }
 
 template<typename T = void>
-void TestSetClock(LCDMenuController menuController){
+//y,m,d,h,min,am -> [am=0,pm=1]
+String^ TestSetClock(LCDMenuController menuController, int y, int mon, int d, int h, int min, int amPm){
 	
-	menuController._optionCount = 2020;
+	menuController._optionCount = y;
 	menuController.SaveRangeOption(LCDMenu::RangeType::Year, LCDMenu::MenuType::Clock);
 	
-	menuController._optionCount = 2;
+	menuController._optionCount = mon;
 	menuController.SaveRangeOption(LCDMenu::RangeType::Month, LCDMenu::MenuType::Clock);
 
-	menuController._optionCount = 20;
+	menuController._optionCount = d;
 	menuController.SaveRangeOption(LCDMenu::RangeType::Day, LCDMenu::MenuType::Clock);
 
-	menuController._optionCount = 3;
+	menuController._optionCount = h;
 	menuController.SaveRangeOption(LCDMenu::RangeType::Hour, LCDMenu::MenuType::Clock);
 
-	menuController._optionCount = 22;
+	menuController._optionCount = min;
 	menuController.SaveRangeOption(LCDMenu::RangeType::Minute, LCDMenu::MenuType::Clock);
 
-	menuController._optionCount = 0;
+	menuController._optionCount = amPm;//0=am,1=PM
 	menuController.SaveRangeOption(LCDMenu::RangeType::AmPm, LCDMenu::MenuType::Clock);
 
-	menuController.PrintTime();
+	return menuController.GetTimeLong(LCDMenu::MenuType::Clock);
 }
 
 
@@ -162,14 +157,29 @@ template<typename T = void>
 int TestMenu()
 {
 	long sleep = 60 * 1000;
+	String^ time;
+	String^ freq;
 
 	LCDMenuController menuController;
-	TestSetClock(menuController);
-	TestSetTimer(menuController);
 
+	time = TestSetClock(menuController, 2024, 1, 23, 12, 54, 0); //01/23/2024 12:54AM, !01/22/2024 11:54PM
+
+	time = TestSetClock(menuController, 2021, 7, 18, 8, 46, 1); // 07/18/2021 08:46PM
+	time = TestSetClock(menuController, 2018, 3, 9, 2, 4, 0); // 03/09/2018 02:04AM
+	freq = TestSetTimer(menuController, 0, 5, 10, 0); //05:10AM, Daily
+	freq = TestSetTimer(menuController, 1, 5, 10, 1); //05:10PM, Every Other Day
+	time = TestSetClock(menuController, 2022, 6, 2, 12, 41, 1); // 06/02/2022 12:41PM
+	
+	time = TestSetClock(menuController, 2025, 11, 30, 11, 59, 1);
+	freq = TestSetTimer(menuController, 0, 12, 59, 0);
+	freq = TestSetTimer(menuController, 1, 12, 59, 1);
+	freq = TestSetTimer(menuController, 0, 1, 0, 0);
+	freq = TestSetTimer(menuController, 1, 1, 0, 1);
+
+	menuController.PrintTime();
 	menuController.PrintRunInfo(LCDMenu::MenuType::Feeder);
 	menuController.SelectMainMenu();
-	
+
 	//for scroll outside main menu
 	menuController.PrintRunInfo(LCDMenu::MenuType::Feeder);
 	Thread::Sleep(sleep);
