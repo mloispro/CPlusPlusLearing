@@ -177,6 +177,9 @@ int TestMenu()
 	
 	menuController.PrintTime();
 	menuController.PrintRunInfo(AccessoryType::Feeder);
+
+	TestRunFeederDoser(AccessoryType::Feeder);
+
 	menuController.SelectMainMenu();
 
 	//for scroll outside main menu
@@ -188,6 +191,33 @@ int TestMenu()
 	Thread::Sleep(sleep);
 
 	return 0;
+}
+
+void TestRunFeederDoser(AccessoryType accType){
+	
+	RTCExt::SetRTCTime(8, 30, 0, 4, 18, 2016);
+	
+	NextRunMemory& initRun = RTCExt::FindNextRunInfo(accType);
+	initRun.RunEvery = 20;
+	initRun.NextRun = 0;
+	RTCExt::UpdateNextRun(accType);
+
+	int sleep = 1;
+	int elasped = 0;
+
+	while (true){
+		RTCExt::_rtcTime += elasped;
+		bool isTimeToRun = RTCExt::IsTimeToRun(accType);
+		if (isTimeToRun){
+			//Feed/Dose
+			//RTCExt::SetRTCTime(10, 15, 0, 4, 18, 2016);
+			RTCExt::SetLastRun(accType);
+			break;
+		}
+
+		Thread::Sleep(sleep * 1000);
+		elasped += sleep;
+	}
 }
 
 #pragma endregion LCDMenu

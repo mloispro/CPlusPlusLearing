@@ -166,7 +166,7 @@ namespace Utils {
 				hourAdd = 1;
 			}
 
-			time_t t = time(NULL);
+		/*	time_t t = time(NULL);
 			tm timePtr;
 			localtime_s(&timePtr, &t);
 			timePtr.tm_hour = theHour + hourAdd;
@@ -174,11 +174,10 @@ namespace Utils {
 			timePtr.tm_sec = theSecond;
 			timePtr.tm_mday = theDay;
 			timePtr.tm_mon = theMonth - 1;
-			timePtr.tm_year = theYear - 1900;
+			timePtr.tm_year = theYear - 1900;*/
 			
-			_rtcTime = mktime(&timePtr);
+			_rtcTime = CreateTime(theHour, theMinute, theSecond, theDay, theMonth, theYear);//mktime(&timePtr);
 
-			
 
 			//setTime(theHour, theMinute, theSecond, theDay, theMonth, theYear);
 			
@@ -197,6 +196,30 @@ namespace Utils {
 		//<--dont copy to EAL--
 
 		static DigitalTime _timeTemp(0, 0, 0);
+		
+		template<typename T = void>
+		long CreateTime(int theHour, int theMinute, int theSecond, int theDay, int theMonth, int theYear)
+		{
+			//12/31/2025 12:59PM
+			//!12/31/2025 11:59AM
+			int hourAdd = 0;
+			if (theHour < 12){
+				hourAdd = 1;
+			}
+
+			time_t t = time(NULL);
+			tm timePtr;
+			localtime_s(&timePtr, &t);
+			timePtr.tm_hour = theHour + hourAdd;
+			timePtr.tm_min = theMinute;
+			timePtr.tm_sec = theSecond;
+			timePtr.tm_mday = theDay;
+			timePtr.tm_mon = theMonth - 1;
+			timePtr.tm_year = theYear - 1900;
+
+			time_t newTime = mktime(&timePtr);
+			return (long)newTime;
+		}
 
 		template<typename H = int, typename M = int, typename S = int>
 		String^ FormatDigialTime(H&& hours, M&& minutes, S&& seconds)
@@ -513,6 +536,13 @@ namespace Utils {
 
 			nextRunMem.NextRun = newNrTime;
 
+			UpdateNextRun(accType);
+		}
+		template<typename P = AccessoryType>
+		void SetLastRun(P&& accType)
+		{
+			NextRunMemory& nextRunMem = FindNextRunInfo(accType);
+			nextRunMem.LastRun = GetRTCTime();
 			UpdateNextRun(accType);
 		}
 		template<typename T = time_t>

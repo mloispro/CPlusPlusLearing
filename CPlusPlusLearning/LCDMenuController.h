@@ -25,8 +25,6 @@ using namespace std;
 
 //using namespace Models;
 
-
-
 namespace Controllers {
 
 	class LCDMenuController{
@@ -53,52 +51,49 @@ namespace Controllers {
 		const short doserAmPmMenu = 18;
 		const short doserTimeMenu = 19;
 
-		int _lowerLimit;
-		int _upperLimit;
-
-		int _keyValues[5];
-		int _numOfKeys = 5;
 		vector<LCDMenu> _menus;
 		
 		short _selectedMenuId = -1;
 		short _selectedOptionId = -1;
 		
+		int _lowerLimit;
+		int _upperLimit;
+
+		//--key press
+		/*int _keyValues[5];
+		int _numOfKeys = 5;*/
+		int GetKeyFromVal(unsigned int input);
+		int GetKey();
+		void NextOption();
+		void PreviousOption();
+		void LeftButton();
+		void SelectButton();
+		void LimitRange(int lower, int upper);
+		void DetectKeyPress();
+
+		LCDMenu GetMenu(short id, short optionId);
+		void PrintMenu(LCDMenu menu);
+		void PrintLine(short lineNum, String^ text);
+		void SetSelectedMenu(LCDMenu menu);
+
+		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType);
+		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, AccessoryType accType);
+		void CreateMenus();
+		LCDMenu GetSelectedMenu();
+
 		//LiquidCrystal _lcd(8, 9, 4, 5, 6, 7);
 		
-		void LimitRange(int lower, int upper);
-
 	public:
 		int _optionCount;
 
 		LCDMenuController();
-		LCDMenu GetSelectedMenu();
-		void SetSelectedMenu(LCDMenu menu);
-		void PrintLine(short lineNum, String^ text);
-		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType);
-		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, AccessoryType accType);
+		
 		String^ GetRangeOption(LCDMenu::RangeType rangeType, AccessoryType accType);
 		void SaveRangeOption(LCDMenu::RangeType rangeType, AccessoryType accType);
 		
-		void CreateMenus();
-
-		//--Menu functions
-		LCDMenu GetMenu(short id, short optionId);
-
-		void PrintMenu(LCDMenu menu);
-
 		void SelectMainMenu();
 		void ExitMainMenu();
-
-		////--key press
-		int GetKeyFromVal(unsigned int input);
-		int GetKey();
 		
-		void NextOption();
-		void PreviousOption();
-		void LeftButton();
-		
-		void SelectButton();
-		void CheckIfKeyPressed();
 		void PrintRunInfo(AccessoryType accType);
 		void PrintTime();
 		String^ GetTimeFrequency(AccessoryType accType);
@@ -106,12 +101,6 @@ namespace Controllers {
 
 	};
 }
-//template<typename T = void>
-//void Clear()
-//{
-//	_lcd.clear();
-//}
-
 
 #endif
 

@@ -310,7 +310,7 @@ void LCDMenuController::SelectMainMenu()
 
 	while (_selectedMenuId > -1)
 	{
-		CheckIfKeyPressed();
+		DetectKeyPress();
 		//delay(200);
 		System::Threading::Thread::Sleep(200);
 	}
@@ -446,7 +446,7 @@ void LCDMenuController::SelectButton()
 }
 
 
-void LCDMenuController::CheckIfKeyPressed()
+void LCDMenuController::DetectKeyPress()
 {
 	int key = GetKey();
 	//SerialExt::Debug("key:", key);
@@ -455,7 +455,6 @@ void LCDMenuController::CheckIfKeyPressed()
 	//LCDMenuItem currentMenuItem = LCDExt::GetCurrentMenuItem();
 	//
 	//SerialExt::Debug("currentMenuIndex", LCDExt::CurrentMenuIndex);
-
 	//SerialExt::Debug("cm", currentMenu.Text);
 	//SerialExt::Debug("mi", currentMenuItem.Text);
 
@@ -565,17 +564,11 @@ String^ LCDMenuController::GetTimeFrequency(AccessoryType accType)
 {
 	long runEvery;
 	long nextRun;
-	
-	if (accType == AccessoryType::Feeder)
-	{
-		runEvery = RTCExt::NextFeedInfo.RunEvery;
-		nextRun = RTCExt::NextFeedInfo.NextRun;
-	}
-	else if (accType == AccessoryType::DryDoser)
-	{
-		runEvery = RTCExt::NextDoseInfo.RunEvery;
-		nextRun = RTCExt::NextDoseInfo.NextRun;
-	}
+
+	NextRunMemory& nextRunMem = RTCExt::FindNextRunInfo(accType);
+
+	runEvery = nextRunMem.RunEvery;
+	nextRun = nextRunMem.NextRun;
 
 	if (runEvery <= 0)
 		return "Not Set";
