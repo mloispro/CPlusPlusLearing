@@ -75,9 +75,9 @@ namespace Controllers {
 		void SetSelectedMenu(LCDMenu menu);
 		void PrintLine(short lineNum, String^ text);
 		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType);
-		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, LCDMenu::MenuType menuType);
-		String^ GetRangeOption(LCDMenu::RangeType rangeType, LCDMenu::MenuType menuType);
-		void SaveRangeOption(LCDMenu::RangeType rangeType, LCDMenu::MenuType menuType);
+		void AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, AccessoryType accType);
+		String^ GetRangeOption(LCDMenu::RangeType rangeType, AccessoryType accType);
+		void SaveRangeOption(LCDMenu::RangeType rangeType, AccessoryType accType);
 		
 		void CreateMenus();
 
@@ -99,10 +99,10 @@ namespace Controllers {
 		
 		void SelectButton();
 		void CheckIfKeyPressed();
-		void PrintRunInfo(LCDMenu::MenuType menuType);
+		void PrintRunInfo(AccessoryType accType);
 		void PrintTime();
-		String^ GetTimeFrequency(LCDMenu::MenuType menuType);
-		String^ GetTimeLong(LCDMenu::MenuType menuType);
+		String^ GetTimeFrequency(AccessoryType accType);
+		String^ GetTimeLong(AccessoryType accType);
 
 	};
 }

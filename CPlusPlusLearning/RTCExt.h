@@ -69,9 +69,6 @@ namespace Utils {
 		static int SECS_PER_HOUR = 3600;
 		static int SECS_PER_DAY = 86400;
 
-		//#define SECS_PER_MIN  (60UL)
-		//#define SECS_PER_HOUR (3600UL)
-		//#define SECS_PER_DAY  (SECS_PER_HOUR * 24UL)
 		//#define minutesToTime_t ((M)) ( (M) * SECS_PER_MIN)  
 		//#define hoursToTime_t   ((H)) ( (H) * SECS_PER_HOUR)  
 		//#define daysToTime_t    ((D)) ( (D) * SECS_PER_DAY) // fixed on Jul 22 2011
@@ -158,127 +155,7 @@ namespace Utils {
 		bool isPM(time_t t) { // returns true if PM
 			return (hour(t) >= 12);
 		}
-		//static tmElements_t _tmElements;          // a cache of time elements
-		//template<typename T = void>
-		//time_t makeTime(tmElements_t &tm){
-		//	// assemble time elements into time_t 
-		//	// note year argument is offset from 1970 (see macros in time.h to convert to other formats)
-		//	// previous version used full four digit year (or digits since 2000),i.e. 2009 was 2009 or 9
-
-		//	int i;
-		//	uint32_t seconds;
-
-		//	// seconds from 1970 till 1 jan 00:00:00 of the given year
-		//	seconds = tm.Year*(SECS_PER_DAY * 365);
-		//	for (i = 0; i < tm.Year; i++) {
-		//		if (LEAP_YEAR(i)) {
-		//			seconds += SECS_PER_DAY;   // add extra days for leap years
-		//		}
-		//	}
-
-		//	// add days for this year, months start from 1
-		//	for (i = 1; i < tm.Month; i++) {
-		//		if ((i == 2) && LEAP_YEAR(tm.Year)) {
-		//			seconds += SECS_PER_DAY * 29;
-		//		}
-		//		else {
-		//			seconds += SECS_PER_DAY * monthDays[i - 1];  //monthDay array starts from 0
-		//		}
-		//	}
-		//	seconds += (tm.Day - 1) * SECS_PER_DAY;
-		//	seconds += tm.Hour * SECS_PER_HOUR;
-		//	seconds += tm.Minute * SECS_PER_MIN;
-		//	seconds += tm.Second;
-		//	return (time_t)seconds;
-		//}
-		//template<typename T = void>
-		//void breakTime(time_t timeInput, tmElements_t &tm){
-		//	// break the given time_t into time components
-		//	// this is a more compact version of the C library localtime function
-		//	// note that year is offset from 1970 !!!
-
-		//	uint8_t year;
-		//	uint8_t month, monthLength;
-		//	uint32_t time;
-		//	unsigned long days;
-
-		//	time = (uint32_t)timeInput;
-		//	tm.Second = time % 60;
-		//	time /= 60; // now it is minutes
-		//	tm.Minute = time % 60;
-		//	time /= 60; // now it is hours
-		//	tm.Hour = time % 24;
-		//	time /= 24; // now it is days
-		//	tm.Wday = ((time + 4) % 7) + 1;  // Sunday is day 1 
-
-		//	year = 0;
-		//	days = 0;
-		//	while ((unsigned)(days += (LEAP_YEAR(year) ? 366 : 365)) <= time) {
-		//		year++;
-		//	}
-		//	tm.Year = year; // year is offset from 1970 
-
-		//	days -= LEAP_YEAR(year) ? 366 : 365;
-		//	time -= days; // now it is days in this year, starting at 0
-
-		//	days = 0;
-		//	month = 0;
-		//	monthLength = 0;
-		//	for (month = 0; month<12; month++) {
-		//		if (month == 1) { // february
-		//			if (LEAP_YEAR(year)) {
-		//				monthLength = 29;
-		//			}
-		//			else {
-		//				monthLength = 28;
-		//			}
-		//		}
-		//		else {
-		//			monthLength = monthDays[month];
-		//		}
-
-		//		if (time >= monthLength) {
-		//			time -= monthLength;
-		//		}
-		//		else {
-		//			break;
-		//		}
-		//	}
-		//	tm.Month = month + 1;  // jan is month 1  
-		//	tm.Day = time + 1;     // day of month
-		//}
-		//template<typename T = void>
-		//void RCset(time_t t)
-		//{
-		//	tmElements_t tm;
-
-		//	breakTime(t, tm);
-		//	
-		//}
-		//template<typename T = void>
-		//void setTime(time_t t) {
-
-		//	//_rtcTime = (uint32_t)t;
-		//	_rtcTime = t;
-		//	
-		//}
-		//template<typename T = void>
-		//void setTime(int hr, int min, int sec, int dy, int mnth, int yr){
-		//	// year can be given as full four digit year or two digts (2010 or 10 for 2010);  
-		//	//it is converted to years since 1970
-		//	if (yr > 99)
-		//		yr = yr - 1970;
-		//	else
-		//		yr += 30;
-		//	_tmElements.Year = yr;
-		//	_tmElements.Month = mnth;
-		//	_tmElements.Day = dy;
-		//	_tmElements.Hour = hr;
-		//	_tmElements.Minute = min;
-		//	_tmElements.Second = sec;
-		//	setTime(makeTime(_tmElements));
-		//}
-
+		
 		template<typename T = void>
 		void SetRTCTime(int theHour, int theMinute, int theSecond, int theDay, int theMonth, int theYear)
 		{
@@ -430,28 +307,29 @@ namespace Utils {
 			if (theYear < 2016)return false;
 			return true;
 		}
-		template<typename T = LCDMenu::MenuType>
-		void UpdateNextRun(T&& menuType){
+		template<typename T = AccessoryType>
+		NextRunMemory& FindNextRunInfo(T&& accType){
+			if (accType == AccessoryType::Feeder)
+				return NextFeedInfo;
+			else if (accType == AccessoryType::DryDoser)
+				return NextDoseInfo;
+		}
+
+		template<typename T = AccessoryType>
+		void UpdateNextRun(T&& accType){
 
 			auto rtcTime = GetRTCTime();
+			NextRunMemory& nextRunMem = FindNextRunInfo(accType);
 
-			long runEvery = 0;
-			long countDown = 0;
-			long nextRun = 0;
-			long lastRun = 0;
-
-			if (menuType == LCDMenu::MenuType::Feeder){
-				runEvery = NextFeedInfo.RunEvery;
-				countDown = NextFeedInfo.CountDown;
-				nextRun = NextFeedInfo.NextRun;
-				lastRun = NextFeedInfo.LastRun;
-			}
-			else if (menuType == LCDMenu::MenuType::DryDoser){
-				runEvery = NextDoseInfo.RunEvery;
-				countDown = NextDoseInfo.CountDown;
-				nextRun = NextDoseInfo.NextRun;
-				lastRun = NextDoseInfo.LastRun;
-			}
+			int runEvery = 0;
+			int countDown = 0;
+			int nextRun = 0;
+			int lastRun = 0;
+			
+			runEvery = nextRunMem.RunEvery;
+			countDown = nextRunMem.CountDown;
+			nextRun = nextRunMem.NextRun;
+			lastRun = nextRunMem.LastRun;
 
 			//auto runev = GetDigitalTimeString(runEvery);
 			////StaticUtils::Debug(runEvery);
@@ -462,69 +340,58 @@ namespace Utils {
 			
 
 			if (!IsRTCTimeSet() || runEvery == 0)
-			{
 				return;// rtcTime;
-			}
 
 			//auto rtc = GetShortDateTimeString(rtcTime);
 			//auto nr = GetShortDateTimeString(nextRun);
 			//auto cd = GetTimeRemainingString(countDown);
 			//auto re = GetTimeRemainingString(runEvery);
 
-			if (lastRun == 0)
-			{
-				//before first feeding
+			if (lastRun == 0) //before first feeding
 				lastRun = rtcTime;
-			}
 
-			if (nextRun <= 0){
+			if (lastRun > rtcTime)
+				lastRun = rtcTime;
 
+			if (nextRun <= 0)
 				nextRun = rtcTime + runEvery; //08:51:49
-			}
 
-			if (lastRun > 0 && nextRun <= rtcTime){
+			if (lastRun > 0 && nextRun <= rtcTime)
 				nextRun = lastRun + runEvery;
-			}
+			
 			countDown = nextRun - rtcTime; //00:00:06
 
 			if (nextRun <= rtcTime){
 				nextRun = rtcTime;
 				countDown = 0;
 			}
-
 			
 		/*	auto nr2 = GetShortDateTimeString(nextRun);
 			auto cd2 = GetTimeRemainingString(countDown);
 			auto re2 = GetTimeRemainingString(runEvery);*/
-	
-
-			if (menuType == LCDMenu::MenuType::Feeder){
-				NextFeedInfo.RunEvery = runEvery;
-				NextFeedInfo.CountDown = countDown;
-				NextFeedInfo.NextRun = nextRun;
-				NextFeedInfo.LastRun = lastRun;
-			}
-			else if (menuType == LCDMenu::MenuType::DryDoser){
-				NextDoseInfo.RunEvery = runEvery;
-				NextDoseInfo.CountDown = countDown;
-				NextDoseInfo.NextRun = nextRun;
-				NextDoseInfo.LastRun = lastRun;
-			}
+			
+			nextRunMem.RunEvery = runEvery;
+			nextRunMem.CountDown = countDown;
+			nextRunMem.NextRun = nextRun;
+			nextRunMem.LastRun = lastRun;
 
 		}
 
-		//<--dont copy to EAL--
+		template<typename T=void>
+		bool IsTimeToRun(AccessoryType accType){
+			
+			NextRunMemory& nextRunMem = FindNextRunInfo(accType);
+			if (nextRunMem.RunEvery <= 0)return true; //not using rtc
 
-		// --copy to EAL-->
-
-		//template<typename T>
-		//time_t ConvHoursToTime(T&& hours)
-		//{
-		//	T t(hours);
-		//	auto time = hoursToTime_t(hours);
-		//	return time;
-		//}
-
+			time_t runTime = RTCExt::GetRTCTime();
+			UpdateNextRun(accType);
+			time_t nextRun = nextRunMem.NextRun;
+			//int runTime = TimerExt::GetRuntimeInSeconds();
+			if (nextRun <= runTime){
+				return true;
+			}
+			return false;
+		}
 
 		template<typename T=void>
 		long ConvHoursToSec(int hour)
@@ -564,20 +431,17 @@ namespace Utils {
 			return freqTime;
 		}
 
-		template<typename T = long, typename M = LCDMenu::MenuType>
-		void SetRunEvery(T&& hour, M&& menuType)
+		template<typename T = long, typename M = AccessoryType>
+		void SetRunEvery(T&& hour, M&& accType)
 		{
 			T t(hour);
 			auto sec = ConvHoursToSec(hour);
-			if (menuType == LCDMenu::MenuType::Feeder){
-				NextFeedInfo.RunEvery = sec;
-				NextFeedInfo.NextRun = 0; //need to set to 0 so it recalculates
-			}
-			else if (menuType == LCDMenu::MenuType::DryDoser){
-				NextDoseInfo.RunEvery = sec;
-				NextDoseInfo.NextRun = 0; //need to set to 0 so it recalculates
-			}
-			UpdateNextRun(menuType);
+			NextRunMemory& nextRunMem = FindNextRunInfo(accType);
+
+			nextRunMem.RunEvery = sec;
+			nextRunMem.NextRun = 0; //need to set to 0 so it recalculates
+
+			UpdateNextRun(accType);
 		}
 		template<typename T=void>
 		void SetRTCTimeFromTemp()
@@ -614,20 +478,18 @@ namespace Utils {
 					_timeTemp.Hours = _timeTemp.Hours + 12;
 			}
 		}
-		template<typename T, typename M = LCDMenu::RangeType, typename P = LCDMenu::MenuType>
-		void SetNextRun(T&& val, M&& rangeType, P&& menuType)
+		template<typename T, typename M = LCDMenu::RangeType, typename P = AccessoryType>
+		void SetNextRun(T&& val, M&& rangeType, P&& accType)
 		{
 			T t(val);
 			M m(rangeType);
-			P p(menuType);
+			P p(accType);
 
 			tm timePtr;
 			time_t nrTime;
 
-			if (menuType==LCDMenu::MenuType::Feeder)
-				nrTime = time_t(NextFeedInfo.NextRun);
-			else if (menuType == LCDMenu::MenuType::DryDoser)
-				nrTime = time_t(NextDoseInfo.NextRun);
+			NextRunMemory& nextRunMem = FindNextRunInfo(accType);
+			nrTime = time_t(nextRunMem.NextRun);
 
 			localtime_s(&timePtr, &nrTime);
 
@@ -649,12 +511,9 @@ namespace Utils {
 
 			auto newNrTime = mktime(&timePtr);
 
-			if (menuType == LCDMenu::MenuType::Feeder)
-				NextFeedInfo.NextRun = newNrTime;
-			else if (menuType == LCDMenu::MenuType::DryDoser)
-				NextDoseInfo.NextRun = newNrTime;
+			nextRunMem.NextRun = newNrTime;
 
-			UpdateNextRun(menuType);
+			UpdateNextRun(accType);
 		}
 		template<typename T = time_t>
 		DigitalTime GetTimeRemaining(T&& seconds){

@@ -10,6 +10,16 @@ using namespace System;
 
 
 namespace Utils {
+	
+	enum AccessoryType
+	{
+		None,
+		Clock,
+		Feeder,
+		LiqDoser,
+		DryDoser
+	};
+
 	namespace StaticUtils{
 
 		//extern int startTime = System::DateTime::Now.Millisecond;
