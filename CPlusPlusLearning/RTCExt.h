@@ -41,16 +41,6 @@ namespace Utils {
 		DigitalTime(int hours, int minutes, int seconds) : Hours(hours), Minutes(minutes), Seconds(seconds){}
 	};
 
-	//struct tmElements_t{
-	//	
-	//	uint32_t Hour;
-	//	uint32_t Minute;
-	//	uint32_t Second;
-	//	uint32_t Day;
-	//	uint32_t Month;
-	//	uint32_t Year;
-	//	uint32_t Wday;
-	//};
 
 	////remeber: dependant functions must be defined first in namespace.
 	///**Better to use template functions.
@@ -156,16 +146,14 @@ namespace Utils {
 		bool isPM(time_t t) { // returns true if PM
 			return (hour(t) >= 12);
 		}
-		
+
+		static DigitalTime _timeTemp(0, 0, 0);
+
 		template<typename T = void>
 		void SetRTCTime(int theHour, int theMinute, int theSecond, int theDay, int theMonth, int theYear)
 		{
 			//12/31/2025 12:59PM
 			//!12/31/2025 11:59AM
-			int hourAdd = 0;
-			if (theHour < 12){
-				hourAdd = 1;
-			}
 
 		/*	time_t t = time(NULL);
 			tm timePtr;
@@ -193,11 +181,7 @@ namespace Utils {
 		{
 			return now();
 		}
-#pragma endregion EAL_DONT_COPY
-		//<--dont copy to EAL--
 
-		static DigitalTime _timeTemp(0, 0, 0);
-		
 		template<typename T = void>
 		long CreateTime(int theHour, int theMinute, int theSecond, int theDay, int theMonth, int theYear)
 		{
@@ -221,6 +205,8 @@ namespace Utils {
 			time_t newTime = mktime(&timePtr);
 			return (long)newTime;
 		}
+
+		
 
 		template<typename H = int, typename M = int, typename S = int>
 		String^ FormatDigialTime(H&& hours, M&& minutes, S&& seconds)
@@ -322,7 +308,6 @@ namespace Utils {
 			return result;
 
 		}
-
 		template<typename T = void>
 		bool IsRTCTimeSet()
 		{
@@ -331,6 +316,9 @@ namespace Utils {
 			if (theYear < 2016)return false;
 			return true;
 		}
+#pragma endregion EAL_DONT_COPY
+		//<--dont copy to EAL--
+	
 		template<typename T = AccessoryType>
 		NextRunMemory& FindNextRunInfo(T&& accType){
 			if (accType == AccessoryType::Feeder)
@@ -354,22 +342,9 @@ namespace Utils {
 			countDown = nextRunMem.CountDown;
 			nextRun = nextRunMem.NextRun;
 			lastRun = nextRunMem.LastRun;
-
-			//auto runev = GetDigitalTimeString(runEvery);
-			////StaticUtils::Debug(runEvery);
-			//StaticUtils::WriteLine("runEvery");
-			//StaticUtils::Debug(runev);
-			//StaticUtils::WriteLine("rtcTime");
-			//StaticUtils::Debug(rtcTime);
 			
-
 			if (!IsRTCTimeSet() || runEvery == 0)
 				return;// rtcTime;
-
-			//auto rtc = GetShortDateTimeString(rtcTime);
-			//auto nr = GetShortDateTimeString(nextRun);
-			//auto cd = GetTimeRemainingString(countDown);
-			//auto re = GetTimeRemainingString(runEvery);
 
 			if (lastRun == 0) //before first feeding
 				lastRun = rtcTime;
@@ -479,9 +454,6 @@ namespace Utils {
 		void SetTimeTemp(T&& val, M&& rangeType)
 		{
 			T t(val);
-
-			//TODO: remove
-			DigitalTime dt(0, 0, 0);
 
 			if (rangeType == LCDMenu::RangeType::Year)
 				_timeTemp.Year = val;

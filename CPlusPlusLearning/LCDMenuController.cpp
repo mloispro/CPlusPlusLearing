@@ -441,29 +441,19 @@ void LCDMenuController::LimitRange(int lower, int upper)
 
 void LCDMenuController::NextOption()
 {
-	
 
-	//bool optionChanged = false;
 	if (_selectedOptionId >= 0)
 	{
 		short nextOptionId = _selectedOptionId + 1;
 		auto nextMenu = GetMenu(_selectedMenuId, nextOptionId);
 		if (nextMenu.Id == _selectedMenuId && nextMenu.OptionId == nextOptionId)
-		{
 			_selectedOptionId = nextOptionId;
-			//optionChanged = true;
-		}
 	}
 
 	auto selectedMenu = GetSelectedMenu();
 	
-	//if (selectedMenu.TheRangeType != LCDMenu::RangeType::Nav && selectedMenu.Changeable)
-	//GetRangeOption(selectedMenu.TheRangeType);
-	
 	_optionCount++;
 	PrintMenu(selectedMenu);
-
-	
 }
 
 
@@ -471,23 +461,15 @@ void LCDMenuController::NextOption()
 void LCDMenuController::PreviousOption()
 {
 	
-
-	//bool optionChanged = false;
 	if (_selectedOptionId > 0)
 	{
 		short prevOptionId = _selectedOptionId - 1;
 		auto prevMenu = GetMenu(_selectedMenuId, prevOptionId);
 		if (prevMenu.Id == _selectedMenuId && prevMenu.OptionId == prevOptionId)
-		{
 			_selectedOptionId = prevOptionId;
-			//optionChanged = true;
-		}
 	}
 
 	auto selectedMenu = GetSelectedMenu();
-
-	
-	//GetRangeOption(selectedMenu.TheRangeType);
 	
 	_optionCount--;
 	PrintMenu(selectedMenu);
@@ -524,16 +506,6 @@ void LCDMenuController::SelectButton()
 void LCDMenuController::DetectKeyPress()
 {
 	int key = GetKey();
-	//SerialExt::Debug("key:", key);
-
-	//LCDMenu currentMenu = LCDExt::GetCurrentMenu();
-	//LCDMenuItem currentMenuItem = LCDExt::GetCurrentMenuItem();
-	//
-	//SerialExt::Debug("currentMenuIndex", LCDExt::CurrentMenuIndex);
-	//SerialExt::Debug("cm", currentMenu.Text);
-	//SerialExt::Debug("mi", currentMenuItem.Text);
-
-	//PrintMenu();
 
 	switch (key) {
 	case 0: //right
