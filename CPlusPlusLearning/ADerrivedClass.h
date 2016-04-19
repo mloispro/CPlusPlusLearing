@@ -4,8 +4,10 @@ class ADerrivedClass :
 	public AClass
 {
 public:
+	//int Shakes;
 	//ADerrivedClass();
 	ADerrivedClass(int shared);
+	
 	//~ADerrivedClass();
 };
 

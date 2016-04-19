@@ -182,10 +182,12 @@ int TestMenu()
 
 	menuController.SelectMainMenu();
 
+	TestSetShakesOrTurnsFeederDoser(menuController, AccessoryType::Feeder);
+
 	//for scroll outside main menu
 	menuController.PrintRunInfo(AccessoryType::Feeder);
 	Thread::Sleep(sleep);
-	menuController.PrintRunInfo(AccessoryType::Feeder);
+	menuController.PrintRunInfo(AccessoryType::DryDoser);
 	Thread::Sleep(sleep);
 	menuController.PrintRunInfo(AccessoryType::Feeder);
 	Thread::Sleep(sleep);
@@ -193,12 +195,28 @@ int TestMenu()
 	return 0;
 }
 
+void TestSetShakesOrTurnsFeederDoser(LCDMenuController menuController, AccessoryType accType){
+	
+	int shakesOrTurns = menuController.GetShakesOrTurns(accType);
+	
+	AClass theClass(1);
+	theClass.Shakes = 2;
+
+	menuController._optionCount = 8;
+	menuController.SaveRangeOption(LCDMenu::RangeType::ShakesOrTurns, accType);
+
+	shakesOrTurns = menuController.GetShakesOrTurns(accType);
+	theClass.Shakes = shakesOrTurns;
+
+	//int shakesOrTurnsFeeder = menuController.GetShakesOrTurns(AccessoryType::Feeder);
+}
+
 void TestRunFeederDoser(AccessoryType accType){
 	
 	RTCExt::SetRTCTime(8, 30, 0, 4, 18, 2016);
 	
 	NextRunMemory& initRun = RTCExt::FindNextRunInfo(accType);
-	initRun.RunEvery = 20;
+	initRun.RunEvery = 10;
 	initRun.NextRun = 0;
 	RTCExt::UpdateNextRun(accType);
 

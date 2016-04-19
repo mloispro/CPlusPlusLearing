@@ -6,6 +6,7 @@ private:
 protected:
 	int _shared;
 public:
+	int Shakes;
 	AClass(int b);
 
 	void AMethod();

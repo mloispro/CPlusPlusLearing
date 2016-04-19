@@ -30,6 +30,8 @@ public:
 		TimeLong,
 		TimeShort,
 		TimeFrequency,
+		ShakesOrTurns,
+		SetShakesOrTurns
 	};
 
 

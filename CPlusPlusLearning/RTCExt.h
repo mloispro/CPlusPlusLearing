@@ -23,6 +23,7 @@ namespace Utils {
 		long NextRun;
 		long CountDown;
 		long RunEvery;
+		short ShakesOrTurns;
 		
 	};
 
@@ -373,8 +374,10 @@ namespace Utils {
 			if (lastRun == 0) //before first feeding
 				lastRun = rtcTime;
 
-			if (lastRun > rtcTime)
+			if (lastRun > rtcTime){
 				lastRun = rtcTime;
+				nextRun = 0;
+			}
 
 			if (nextRun <= 0)
 				nextRun = rtcTime + runEvery; //08:51:49

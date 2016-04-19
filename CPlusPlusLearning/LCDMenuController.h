@@ -27,6 +27,9 @@ using namespace std;
 
 namespace Controllers {
 
+	//typedef void(*lcdVal_callback)(int);
+	
+	
 	class LCDMenuController{
 	private:
 		//using namespace Utils;
@@ -50,9 +53,14 @@ namespace Controllers {
 		const short doserMinMenu = 17;
 		const short doserAmPmMenu = 18;
 		const short doserTimeMenu = 19;
+		const short feedShakesMenu = 20;
+		const short feedSetShakesMenu = 21;
+		const short doserShakesMenu = 22;
+		const short doserSetShakesMenu = 23;
 
 		vector<LCDMenu> _menus;
 		
+		//string _selectedText;
 		short _selectedMenuId = -1;
 		short _selectedOptionId = -1;
 		
@@ -99,6 +107,8 @@ namespace Controllers {
 		String^ GetTimeFrequency(AccessoryType accType);
 		String^ GetTimeLong(AccessoryType accType);
 
+		void SetShakesOrTurns(AccessoryType accType, short shakesOrTurns);
+		int GetShakesOrTurns(AccessoryType accType);
 	};
 }
 

@@ -8,18 +8,6 @@ LCDMenuController::LCDMenuController()
 	CreateMenus();
 }
 	
-
-void LCDMenuController::AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, AccessoryType accType)
-{
-	LCDMenu menu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType, accType);
-	_menus.push_back(menu);
-}
-void LCDMenuController::AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType)
-{
-	AddMenu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType, AccessoryType::None);
-}
-
-
 void LCDMenuController::CreateMenus()
 {
 
@@ -34,20 +22,37 @@ void LCDMenuController::CreateMenus()
 	//feed menus
 	AddMenu(feedMenu, 0, feedTimeMenu, mainMenu, "Feeder: [<] Back", "Feed Time", LCDMenu::RangeType::Nav, AccessoryType::Feeder);
 	AddMenu(feedMenu, 1, feedFreqMenu, mainMenu, "Feeder: [<] Back", "Set Feed Time", LCDMenu::RangeType::Nav, AccessoryType::Feeder);
+	AddMenu(feedMenu, 2, feedShakesMenu, mainMenu, "Feeder: [<] Back", "Set Feed Shakes", LCDMenu::RangeType::Nav, AccessoryType::Feeder);
+	
+	//feed time
 	AddMenu(feedTimeMenu, 0, feedTimeMenu, feedMenu, "Feed Time: [<] Back", "Not Set", LCDMenu::RangeType::TimeFrequency, AccessoryType::Feeder);
 	AddMenu(feedFreqMenu, 0, feedHourMenu, feedMenu, "Feed Frequency: [<] Back", "Frequency", LCDMenu::RangeType::Frequency, AccessoryType::Feeder);
 	AddMenu(feedHourMenu, 0, feedMinMenu, feedFreqMenu, "Feed Hour: [<] Back", "Hour", LCDMenu::RangeType::Hour, AccessoryType::Feeder);
 	AddMenu(feedMinMenu, 0, feedAmPmMenu, feedHourMenu, "Feed Minute: [<] Back", "Minute", LCDMenu::RangeType::Minute, AccessoryType::Feeder);
 	AddMenu(feedAmPmMenu, 0, feedTimeMenu, feedMinMenu, "Feed AM-PM: [<] Back", "AM PM", LCDMenu::RangeType::AmPm, AccessoryType::Feeder);
+	
+	//feed shakes
+	AddMenu(feedShakesMenu, 0, feedShakesMenu, feedMenu, "Feed Shakes: [<] Back", "Not Set", LCDMenu::RangeType::ShakesOrTurns, AccessoryType::Feeder);
+	AddMenu(feedShakesMenu, 1, feedSetShakesMenu, feedShakesMenu, "Feed Shakes: [<] Back", "Set Feed Shakes", LCDMenu::RangeType::Nav, AccessoryType::Feeder);
+	AddMenu(feedSetShakesMenu, 0, feedShakesMenu, feedShakesMenu, "Set Feed Shakes: [<] Back", "Not Set", LCDMenu::RangeType::SetShakesOrTurns, AccessoryType::Feeder);
 
 	//doser menus
 	AddMenu(doserMenu, 0, doserTimeMenu, mainMenu, "Doser: [<] Back", "Doser Time", LCDMenu::RangeType::Nav, AccessoryType::DryDoser);
 	AddMenu(doserMenu, 1, doserFreqMenu, mainMenu, "Doser: [<] Back", "Set Doser Time", LCDMenu::RangeType::Nav, AccessoryType::DryDoser);
+	AddMenu(doserMenu, 2, doserShakesMenu, mainMenu, "Doser: [<] Back", "Set Doser Shakes", LCDMenu::RangeType::Nav, AccessoryType::DryDoser);
+	
+	//dose time
 	AddMenu(doserTimeMenu, 0, doserTimeMenu, doserMenu, "Doser Time: [<] Back", "Not Set", LCDMenu::RangeType::TimeFrequency, AccessoryType::DryDoser);
 	AddMenu(doserFreqMenu, 0, doserHourMenu, doserMenu, "Doser Frequency: [<] Back", "Frequency", LCDMenu::RangeType::Frequency, AccessoryType::DryDoser);
 	AddMenu(doserHourMenu, 0, doserMinMenu, doserFreqMenu, "Doser Hour: [<] Back", "Hour", LCDMenu::RangeType::Hour, AccessoryType::DryDoser);
 	AddMenu(doserMinMenu, 0, doserAmPmMenu, doserHourMenu, "Doser Minute: [<] Back", "Minute", LCDMenu::RangeType::Minute, AccessoryType::DryDoser);
 	AddMenu(doserAmPmMenu, 0, doserTimeMenu, doserMinMenu, "Doser AM-PM: [<] Back", "AM PM", LCDMenu::RangeType::AmPm, AccessoryType::DryDoser);
+
+	//doser shakes
+	AddMenu(doserShakesMenu, 0, doserShakesMenu, doserMenu, "Doser Shakes: [<] Back", "Not Set", LCDMenu::RangeType::ShakesOrTurns, AccessoryType::DryDoser);
+	AddMenu(doserShakesMenu, 1, doserSetShakesMenu, doserShakesMenu, "Doser Shakes: [<] Back", "Set Doser Shakes", LCDMenu::RangeType::Nav, AccessoryType::DryDoser);
+	AddMenu(doserSetShakesMenu, 0, doserShakesMenu, doserShakesMenu, "Set Doser Shakes: [<] Back", "Not Set", LCDMenu::RangeType::SetShakesOrTurns, AccessoryType::DryDoser);
+
 
 	//clock menus
 	AddMenu(clockMenu, 0, clockMenu, mainMenu, "Clock: [<] Back", "Time", LCDMenu::RangeType::TimeLong, AccessoryType::Clock);
@@ -168,6 +173,49 @@ String^ LCDMenuController::GetRangeOption(LCDMenu::RangeType rangeType, Accessor
 		return txt;
 		//return StaticUtils::ParseString(txt);
 	}
+	else if (rangeType == LCDMenu::RangeType::ShakesOrTurns)
+	{
+		int shakes = GetShakesOrTurns(accType);
+		return shakes.ToString();
+	}
+	else if (rangeType == LCDMenu::RangeType::SetShakesOrTurns)
+	{
+		LimitRange(0, 13);
+
+		String^ txt = "0";
+		if (_optionCount <= _upperLimit && _optionCount >= _lowerLimit)
+		{
+			txt = System::Convert::ToString(_optionCount);
+		}
+		return txt;
+	}
+	//else if (rangeType == LCDMenu::RangeType::OutPin)
+	//{
+	//	//pin 14-19 are analog pins but can be used for digital output with SoftPWM
+	//	//14 cant be used because it is used by lcd A0
+	//	LimitRange(2, 19);
+	//	if (_optionCount == 14)
+	//		_optionCount++;
+
+	//	String^ txt = "2";
+	//	if (_optionCount <= _upperLimit && _optionCount >= _lowerLimit)
+	//	{
+	//		txt = System::Convert::ToString(_optionCount);
+	//	}
+	//	return txt;
+	//}
+	//else if (rangeType == LCDMenu::RangeType::InPin)
+	//{
+	//	//pin A0 is used by lcd.
+	//	LimitRange(1, 5);
+
+	//	String^ txt = "1";
+	//	if (_optionCount <= _upperLimit && _optionCount >= _lowerLimit)
+	//	{
+	//		txt = System::Convert::ToString(_optionCount);
+	//	}
+	//	return txt;
+	//}
 	else
 		return "";
 
@@ -219,13 +267,33 @@ void LCDMenuController::SaveRangeOption(LCDMenu::RangeType rangeType, AccessoryT
 		RTCExt::SetTimeTemp(_optionCount, rangeType);
 		RTCExt::SetRTCTimeFromTemp();
 	}
+	else if (rangeType == LCDMenu::RangeType::SetShakesOrTurns &&
+		(accType == AccessoryType::Feeder ||
+		accType == AccessoryType::DryDoser))
+	{
+		SetShakesOrTurns(accType, _optionCount);
+		//_lcdValCallBack(_optionCount);
+	}
+	//else if (rangeType == LCDMenu::RangeType::OutPin &&
+	//	(accType == AccessoryType::Feeder ||
+	//	accType == AccessoryType::DryDoser))
+	//{
+	//	//_lcdValCallBack(_optionCount);
+	//}
 	
 }
-
 	//--Menu functions
-
+void LCDMenuController::AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType, AccessoryType accType)
+{
+	LCDMenu menu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType, accType);
+	_menus.push_back(menu);
+}
+void LCDMenuController::AddMenu(short id, short optionId, short nextMenuId, short prevMenuId, string text, string optionText, LCDMenu::RangeType rangeType)
+{
+	AddMenu(id, optionId, nextMenuId, prevMenuId, text, optionText, rangeType, AccessoryType::None);
+}
 	//get by ref example
-	//auto&& menu = GetMenu(5);
+	//auto& menu = GetMenu(5);
 LCDMenu LCDMenuController::GetMenu(short id, short optionId)
 {
 	auto selectedMenu = _menus[0];
@@ -245,14 +313,21 @@ LCDMenu LCDMenuController::GetSelectedMenu()
 	auto selectedMenu = GetMenu(_selectedMenuId, _selectedOptionId);
 	return selectedMenu;
 }
-
 void LCDMenuController::SetSelectedMenu(LCDMenu menu)
 {
 	_selectedMenuId = menu.Id;
 	_selectedOptionId = menu.OptionId;
 
 }
-
+void LCDMenuController::SetShakesOrTurns(AccessoryType accType, short shakesOrTurns){
+	NextRunMemory& mem = RTCExt::FindNextRunInfo(accType);
+	mem.ShakesOrTurns = shakesOrTurns;
+}
+int LCDMenuController::GetShakesOrTurns(AccessoryType accType){
+	NextRunMemory& mem = RTCExt::FindNextRunInfo(accType);
+	int shakes = mem.ShakesOrTurns;
+	return shakes;
+}
 void LCDMenuController::PrintLine(short lineNum, String^ text)
 {
 	//T t(text);

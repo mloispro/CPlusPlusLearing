@@ -17,7 +17,9 @@ namespace Utils {
 		Clock,
 		Feeder,
 		LiqDoser,
-		DryDoser
+		DryDoser,
+		Pump,
+		Lcd
 	};
 
 	namespace StaticUtils{
